@@ -1,8 +1,6 @@
 import numpy as np
 from os import system
 
-N = 10
-
 delta_t = 0.16
 
 annSteps = 1e3
@@ -25,7 +23,10 @@ for Tfin in Tfins:
     system("echo %f %f %d %d | python3 compute_h.py" % (Tfin, delta_t, 3, 0))
     
     # run the simulated annealing
-    system('if make SA; then echo "%d %d %d %d %d %f %e %d" \&; fi' % (N,3,0,annSteps,MCsteps,T0,K,Reps))
+    L = int(Tfin/delta_t)
+    system('if make SA; then echo "%d %d %d %d %d %f %e %d"; fi' % (N,3,0,annSteps,MCsteps,T0,K,Reps))
+    
+
 
 
 
