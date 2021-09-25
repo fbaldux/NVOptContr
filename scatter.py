@@ -1,22 +1,36 @@
 import numpy as np
 from matplotlib import pyplot as plt
+from glob import glob
 
-N = 625
-T = N*160/1000
-#Ks = np.array((0., 0.0001, 0.0002, 0.0005, 0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1))
-Ks = np.array((0., 0.0001, 0.0002, 0.0005, 0.001, 0.005))
-#Ks = np.array((0., 0.0001, 0.0002, 0.0005, 0.001, 0.002, 0.005))
+# input
+instring = input("").split(' ')
 
-tone = 1
+T = float( instring[0] )
+deltat = float( instring[1] )  
+tone = int( instring[2] ) 
+harmonic = int( instring[3] ) 
 
-for iK in range(len(Ks)):
-    try:
-        data = np.loadtxt("Results/%dtone_%dspins_%dus_K%.4f.txt" % (tone, N,T,Ks[iK])).T
-        plt.plot(data[0], data[1], 'o', ms=2, label="K=%.4f"%Ks[iK])
-        
-    except:
-        None
-        
+L = int(T/deltat)
+
+
+"""# import required module
+import os
+# assign directory
+directory = 'files'
+ 
+# iterate over files in
+# that directory
+for filename in os.listdir(directory):
+    f = os.path.join(directory, filename)
+    # checking if it is a file
+    if os.path.isfile(f):
+        print(f)"""
+
+for filename in glob("Results/%dtone_%dspins_%dus_K?.????.txt" % (tone,L,T)):
+    K = float( filename[-10:-4] )
+    
+    data = np.loadtxt(filename).T
+    plt.plot(data[0], data[1], 'o', ms=2, label="K=%.1e"%K)
 
 plt.xlabel("# of pulses")
 plt.ylabel(r"1/$\eta$")

@@ -38,7 +38,7 @@ if tone==3:
     ii = np.arange(L)+1
     htT = (integrated_target_signal_mf(ii*deltat) - integrated_target_signal_mf((ii-1)*deltat))/T
 
-    print("h fields done")
+    #print("h fields done")
 
     np.savetxt("Init/h_3tone_%dspins_%dus.txt" % (L, T), htT)
 
@@ -62,7 +62,7 @@ elif tone==1:
     ii = np.arange(L)+1
     htT = (integrated_target_signal_lf(ii*deltat) - integrated_target_signal_lf((ii-1)*deltat))/T
 
-    print("h fields done")
+    #print("h fields done")
 
     np.savetxt("Init/h_1tone_%dharm_%dspins_%dus.txt" % (harmonic, L, T), htT)
 

@@ -1,6 +1,6 @@
 Tfin=56       # final time of the experiments
 delta_t=0.16       # pi-pulse distance
-integer N=$((T/delta_t))       # number of spins
+integer N=$((Tfin/delta_t))       # number of spins
 
 tone=3       # type of signal
 harmonic=0       # number of the harmonic for the monochromatic signal
@@ -11,13 +11,23 @@ T0=0.1       # initial temperature
 #K=0.002       # ferromagnetic coupling
 Reps=10       # number of states to sample
 
-if make SA;
-then
+
+
+echo $Tfin $delta_t | python3 compute_J.py &
+echo $Tfin $delta_t $tone $harmonic | python3 compute_h.py &
+wait
+echo "h & J done"
+
+
+make SA
+for K in 1e-4 5e-4 1e-3 5e-3 1e-2;
+do
+    ./SA $N $tone $harmonic $annSteps $MCsteps $T0 $K $Reps &
+    echo "N $N tone $tone harm $harmonic annSteps $annSteps MCsteps $MCsteps T0 $T0 K $K Reps $Reps --> pid $!" >> log.txt
+done
+wait 
+echo "SA done"
+
     
-    for K in 5e-4 2e-4 1e-4;
-    do
-        ./SA $N $tone $harmonic $annSteps $MCsteps $T0 $K $Reps &
-        echo "N $N tone $tone harm $harmonic annSteps $annSteps MCsteps $MCsteps T0 $T0 K $K Reps $Reps --> pid $!" >> log.txt
-        #wait
-    done
-fi
+
+echo $Tfin $delta_t $tone $harmonic | python3 scatter.py &

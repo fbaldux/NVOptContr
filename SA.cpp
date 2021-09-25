@@ -54,7 +54,7 @@ void load_J() {
     char filename[100];
     snprintf(filename, 100, "Init/J_%dspins_%dus.txt", N, N*160/1000);
     ifstream infile(filename);
-    
+        
     if ( ! infile.is_open() ) {
         cerr << "\nError! No input file.\n\n" << endl;
         exit(-1);
@@ -79,7 +79,7 @@ void load_h() {
         snprintf(filename, 100, "Init/h_%dtone_%dspins_%dus.txt", tone, N, N*160/1000);
     else if (tone == 1)
         snprintf(filename, 100, "Init/h_%dtone_%dharm_%dspins_%dus.txt", tone, harmonic, N, N*160/1000);
-        
+      
     ifstream infile(filename);
     
     if ( ! infile.is_open() ) {

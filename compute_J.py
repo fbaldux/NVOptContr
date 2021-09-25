@@ -52,10 +52,10 @@ imj_abs = np.arange(L)
 
 res_err_0 = [quad( lambda omega: funcNoise(omega,*paraNSD_noOffset)*np.cos(imj*omega*deltat)*(1 - np.cos(omega*deltat))/omega**2, 
                   omegaNSDLowLimit, omegaNSDHighLimit, limit=100) for imj in imj_abs]
-print('First integral done')
+#print('First integral done')
 res_err_1 = [quad( lambda omega: np.cos(imj*omega*deltat)*(1 - np.cos(omega*deltat))/omega**2, 
                   omegaLowLimit,omegaHighLimit, limit=150) for imj in imj_abs]
-print('Second integral done')
+#print('Second integral done')
 res_01,err_01 = (2/np.pi)*(np.array(res_err_0)+y0*np.array(res_err_1)).transpose()
 
 
