@@ -1,5 +1,3 @@
-#typeset -a Tfins
-#typeset -a harmonics
 Tfins=(20.8 40.48 100 101.76 219.84 266.08 323.84 340.16 392)  # final time of the experiments
 delta_t=0.16       # pi-pulse distance
 

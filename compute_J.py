@@ -10,6 +10,7 @@ deltat = float( instring[1] )
 
 L = int(T/deltat)
 
+
 if os.path.exists("Init/J_%dspins_%dus.txt" % (L, T)):
     exit(0)
 

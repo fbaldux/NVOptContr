@@ -79,7 +79,7 @@ void load_h() {
         snprintf(filename, 100, "Init/h_%dtone_%dspins_%dus.txt", tone, N, N*160/1000);
     else if (tone == 1)
         snprintf(filename, 100, "Init/h_%dtone_%dharm_%dspins_%dus.txt", tone, harmonic, N, N*160/1000);
-      
+    
     ifstream infile(filename);
     
     if ( ! infile.is_open() ) {
