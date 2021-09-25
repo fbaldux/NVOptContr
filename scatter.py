@@ -12,25 +12,21 @@ harmonic = int( instring[3] )
 
 L = int(T/deltat)
 
+def filename_func():
+    if tone==3:
+        return "Results/3tone_%dspins_%dus_K?.????.txt" % (L,T)
+    if tone==1:
+        return "Results/1tone_%dharm_%dspins_%dus_K?.????.txt" % (harmonic,L,T)
 
-"""# import required module
-import os
-# assign directory
-directory = 'files'
- 
-# iterate over files in
-# that directory
-for filename in os.listdir(directory):
-    f = os.path.join(directory, filename)
-    # checking if it is a file
-    if os.path.isfile(f):
-        print(f)"""
+files = glob(filename_func())
+Ks = np.array([float(f[-10:-4]) for f in files])
 
-for filename in glob("Results/%dtone_%dspins_%dus_K?.????.txt" % (tone,L,T)):
-    K = float( filename[-10:-4] )
+ordr = np.argsort(Ks)
+
+for k in range(len(files)):
     
-    data = np.loadtxt(filename).T
-    plt.plot(data[0], data[1], 'o', ms=2, label="K=%.1e"%K)
+    data = np.loadtxt(files[ordr[k]]).T
+    plt.plot(data[0], data[1], 'o', ms=2, label="K=%.1e"%Ks[ordr[k]])
 
 plt.xlabel("# of pulses")
 plt.ylabel(r"1/$\eta$")

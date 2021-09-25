@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.integrate import quad
-
+import os
 
 # input
 instring = input("").split(' ')
@@ -10,6 +10,8 @@ deltat = float( instring[1] )
 
 L = int(T/deltat)
 
+#if os.path.exists("Init/J_%dspins_%dus.txt" % (L, T)):
+#    exit(0)
 
 # New NSD (see Lablog January 27, 2021)
 y0 = 0.00119; # MHz

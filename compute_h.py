@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.integrate import quad
-
+import os
 
 # input
 instring = input("").split(' ')
@@ -17,6 +17,9 @@ L = int(T/deltat)
 #  compute h (3tone)
 if tone==3:
 
+    #if os.path.exists("Init/h_3tone_%dspins_%dus.txt" % (L, T)):
+    #    exit(0)
+        
     # AC field (time dependent) formed by a tri-chromatic signal
     A1 = 0.065*0.2+1/5; w0 =0.1150; fi1 = 0;
     B1 = 0.237*0.2+1/5; wp1=0.2125; fi2 = 0;
@@ -47,6 +50,10 @@ if tone==3:
 #  compute h (1tone, certain harmonic)
 
 elif tone==1:
+    
+    if os.path.exists("Init/h_1tone_%dharm_%dspins_%dus.txt" % (harmonic, L, T)):
+        exit(0)
+    
     w0 = 0.4322 / (2*harmonic+1); # MHz (central freq of the noise-spectral-density)
     A = 1; fi1 = 0;
     ac_params_lf=(A,w0,fi1)
