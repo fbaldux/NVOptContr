@@ -13,13 +13,14 @@ def filename_func(L,T):
 
 """
 
+# monochrome
 Ts = [ 16.,  32.,  48.,  64.,  80.,  96., 112., 128., 144., 160., 240., 320.]
 deltat = 0.16
 tone = 1
 harm = 5
 
 def filename_func(L,T):
-    return "Results/3tone_%dspins_%dus_K?.????.txt" % (L,T)
+    return "Results/1tone_%dharm_%dspins_%dus_K?.????.txt" % (harm,L,T)
 
 for T in Ts:  
     L = int(T/deltat)
@@ -32,11 +33,11 @@ for T in Ts:
     for k in range(len(files)):
     
         data = np.loadtxt(files[ordr[k]]).T
-        #plt.plot(data[0], data[1], 'o', ms=2, label="K=%.1e"%Ks[ordr[k]])
+        plt.plot(data[0], data[1], 'o', ms=2, label="K=%.1e"%Ks[ordr[k]])
 
         print(T, Ks[ordr[k]], np.argmax(data[1]), np.max(data[1]))
 
-    """plt.xlabel("# of pulses")
+    plt.xlabel("# of pulses")
     plt.ylabel(r"1/$\eta$")
 
     if tone==3:
@@ -45,4 +46,4 @@ for T in Ts:
         plt.title(r"$T=%d \mu$s, monochromatic signal" % T)
 
     plt.legend()
-    plt.show()"""
+    plt.show()

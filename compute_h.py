@@ -17,8 +17,8 @@ L = int(T/deltat)
 #  compute h (3tone)
 if tone==3:
 
-    #if os.path.exists("Init/h_3tone_%dspins_%dus.txt" % (L, T)):
-    #    exit(0)
+    if os.path.exists("Init/h_3tone_%dspins_%dus.txt" % (L, T)):
+        exit(0)
         
     # AC field (time dependent) formed by a tri-chromatic signal
     A1 = 0.065*0.2+1/5; w0 =0.1150; fi1 = 0;

@@ -7,7 +7,7 @@
 
     The variables J[i,j] and h[i] are loaded from a file.
     The energy is computed efficiently at each step.
-    The best configuration is saved to a file, with the # of pulses and 1/eta in the header. 
+    The configurations found are saved to a file, with the # of pulses and 1/eta in the header. 
     
 //  -------------------------------------------------------------------------------------------  */
 
@@ -334,7 +334,6 @@ int main( int argc, char *argv[] ) {
         sprintf(filename, "Results/%dtone_%dspins_%dus_K%.4f.txt", tone, N, N*160/1000, K0);
     else if (tone == 1)
         sprintf(filename, "Results/%dtone_%dharm_%dspins_%dus_K%.4f.txt", tone, harmonic, N, N*160/1000, K0);
-    ofstream outfile(filename);
     FILE *outfile = fopen(filename, "w");  
     fprintf(outfile, "# N=%d, MC_steps=%d, T0=%f, K=%f\n# pulses 1/eta\n", N, MC_steps, T0, K0);
     
