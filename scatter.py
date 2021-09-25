@@ -32,9 +32,9 @@ plt.xlabel("# of pulses")
 plt.ylabel(r"1/$\eta$")
 
 if tone==3:
-    plt.title(r"$T=%d \mu$s, trichromatic signal" % T)
+    plt.title(r"$T=%.2f \mu$s, trichromatic signal" % T)
 elif tone==1:
-    plt.title(r"$T=%d \mu$s, monochromatic signal" % T)
+    plt.title(r"$T=%.2f \mu$s, monochromatic signal" % T)
 
 plt.legend()
 plt.show()
