@@ -1,4 +1,4 @@
-Tfin=296       # final time of the experiments
+Tfin=400       # final time of the experiments
 delta_t=0.16       # pi-pulse distance
 integer N=$((Tfin/delta_t))       # number of spins
 

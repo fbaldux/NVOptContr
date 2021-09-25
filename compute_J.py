@@ -10,8 +10,14 @@ deltat = float( instring[1] )
 
 L = int(T/deltat)
 
-#if os.path.exists("Init/J_%dspins_%dus.txt" % (L, T)):
-#    exit(0)
+if os.path.exists("Init/J_%dspins_%dus.txt" % (L, T)):
+    exit(0)
+
+if os.path.exists("Init/J_%dspins_%dus.txt" % (2500, 400)):
+    Jt = np.loadtxt("Init/J_%dspins_%dus.txt" % (2500, 400)).reshape(2500,2500)
+    Jt = Jt[:L,:L] 
+    np.savetxt("Init/J_%dspins_%dus.txt" % (L, T), Jt.reshape(L**2))
+    exit(0)
 
 # New NSD (see Lablog January 27, 2021)
 y0 = 0.00119; # MHz

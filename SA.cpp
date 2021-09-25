@@ -257,7 +257,10 @@ double etaInv(double epsilon) {
 void save_s(int *s, int dw, double this_etaInv, int r) {
     // create the output file
     char filename[100];
-    snprintf(filename, 100, "Configurations/s_%dtone_%dspins_%dus_K%.4f_r%d.txt", tone, N, N*160/1000, K0, r);
+    if (tone == 3)
+        snprintf(filename, 100, "Configurations/s_%dtone_%dspins_%dus_K%.4f_r%d.txt", tone, N, N*160/1000, K0, r);
+    else if (tone == 1)
+        snprintf(filename, 100, "Configurations/s_%dtone_%dharm_%dspins_%dus_K%.4f_r%d.txt", tone, harmonic, N, N*160/1000, K0, r);        
     ofstream outfile(filename);
     
     if ( ! outfile.is_open() ) {
@@ -327,7 +330,11 @@ int main( int argc, char *argv[] ) {
     
     // create the output file
     char filename[100];
-    sprintf(filename, "Results/%dtone_%dspins_%dus_K%.4f.txt", tone, N, N*160/1000, K0);
+    if (tone == 3)
+        sprintf(filename, "Results/%dtone_%dspins_%dus_K%.4f.txt", tone, N, N*160/1000, K0);
+    else if (tone == 1)
+        sprintf(filename, "Results/%dtone_%dharm_%dspins_%dus_K%.4f.txt", tone, harmonic, N, N*160/1000, K0);
+    ofstream outfile(filename);
     FILE *outfile = fopen(filename, "w");  
     fprintf(outfile, "# N=%d, MC_steps=%d, T0=%f, K=%f\n# pulses 1/eta\n", N, MC_steps, T0, K0);
     
