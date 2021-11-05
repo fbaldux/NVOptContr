@@ -39,9 +39,9 @@ Shell to run the sequence of all monochromatic signals, for the plot with the co
 ---
 ### SA.cpp
 
-The program anneals a random configuration of Ising spins s[i]=+/-1, according to the cost function
+The program anneals a random configuration of Ising spins `s[i]=+/-1`, according to the cost function
    
-   H = sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - K sum_i s[i] s[i+1]
+      H = sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - K sum_i s[i] s[i+1]
 
 - The variables `J[i,j]` and `h[i]` are loaded from a file.
 - The energy is computed efficiently at each step.
