@@ -1,3 +1,15 @@
+#  ---------------------------------------------------------------------------------------------  #
+#
+#   The program computes the couplings J for the spin glass Hamiltonian. The couplings 
+#   represent the noise to be filtered out.
+#
+#   - If the output file already exists, it just quits.
+#   - If an output file for a larger system exists, it just crops it and saves.
+#   - Otherwise, it computes it from scratch.
+#
+#  ---------------------------------------------------------------------------------------------  #
+
+
 import numpy as np
 from scipy.integrate import quad
 import os

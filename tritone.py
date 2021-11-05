@@ -1,3 +1,9 @@
+#  ---------------------------------------------------------------------------------------------  #
+#
+#   The program copies in Best/ the best configurations found for the 3-chromatic case.
+#
+#  ---------------------------------------------------------------------------------------------  #
+
 import numpy as np
 from matplotlib import pyplot as plt
 from glob import glob

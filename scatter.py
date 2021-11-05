@@ -1,3 +1,10 @@
+#  ---------------------------------------------------------------------------------------------  #
+#
+#   Given the final time and tone, the program plots the sensitivities for all the
+#   values of K found in Results/
+#
+#  ---------------------------------------------------------------------------------------------  #
+
 import numpy as np
 from matplotlib import pyplot as plt
 from glob import glob

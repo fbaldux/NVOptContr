@@ -1,3 +1,15 @@
+#  ---------------------------------------------------------------------------------------------  #
+#
+#   The program computes the field h for the spin glass Hamiltonian. The field represents
+#   the signal to be detected.
+#
+#   - If the output file already exists, it just quits.
+#   - It distinguishes between
+#       - 3-chromatic signal (`tone=3`)
+#       - mono-chromatic signal (`tone=1`), and in this case also the harmonic has to be specified
+#
+#  ---------------------------------------------------------------------------------------------  #
+
 import numpy as np
 from scipy.integrate import quad
 import os

@@ -1,10 +1,11 @@
-Tfin=266.08       # final time of the experiments
+Tfin=152.8       # final time of the experiments
 delta_t=0.16       # pi-pulse distance
 integer N=$((Tfin/delta_t))       # number of spins
-N=1663
+echo N
+#N=955
 
-tone=1       # type of signal
-harmonic=11       # number of the harmonic for the monochromatic signal
+tone=3       # type of signal
+harmonic=5       # number of the harmonic for the monochromatic signal
 annSteps=1e3       # number of steps in the temperature ramp
 MCsteps=1e2       # number of MC steps at each ramp level
 T0=0.1       # initial temperature
