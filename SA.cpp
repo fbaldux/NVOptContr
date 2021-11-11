@@ -243,8 +243,8 @@ int domain_walls(int *s) {
     int count=0;
     for (int i=1; i<N; i++)
         count += s[i]*s[i-1];
-  
-    return (N-count)/2;
+    
+    return (N-count-1)/2;
 }
 
 
