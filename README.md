@@ -15,12 +15,6 @@ The program computes the field h for the spin glass Hamiltonian. The field repre
 
 
 ---
-### compare.py
-
-Some trials for the unstable data.
-
-
----
 ### compute\_J.py
 
 The program computes the couplings J for the spin glass Hamiltonian. The couplings represent the noise to be filtered out.
@@ -34,12 +28,6 @@ The program computes the couplings J for the spin glass Hamiltonian. The couplin
 ### run.sh
 
 Shell to run the single instance.
-
-
----
-### run\_monos.sh
-
-Shell to run the sequence of all monochromatic signals, for the plot with the comparison with CPMG.
 
 
 ---
@@ -59,15 +47,3 @@ The program anneals a random configuration of Ising spins `s[i]=+/-1`, according
 ### scatter.py
 
 Given the final time and tone, the program plots the sensitivities for all the values of K found in Results/
-
-
----
-### susceptibility.py
-
-Some trials for the unstable data.
-
-
----
-### tritone.py
-
-The program copies in Best/ the best configurations found for the 3-chromatic case.

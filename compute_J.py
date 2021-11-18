@@ -22,7 +22,7 @@ deltat = float( instring[1] )
 
 L = int(T/deltat)
 
-
+"""
 if os.path.exists("Init/J_%dspins_%dus.txt" % (L, T)):
     exit(0)
 
@@ -31,7 +31,7 @@ if os.path.exists("Init/J_%dspins_%dus.txt" % (2500, 400)):
     Jt = Jt[:L,:L] 
     np.savetxt("Init/J_%dspins_%dus.txt" % (L, T), Jt.reshape(L**2))
     exit(0)
-
+"""
 # New NSD (see Lablog January 27, 2021)
 y0 = 0.00119; # MHz
 Gamma0 = 0.52; # MHz 
@@ -79,6 +79,8 @@ res_err_1 = [quad( lambda omega: np.cos(imj*omega*deltat)*(1 - np.cos(omega*delt
 #print('Second integral done')
 res_01,err_01 = (2/np.pi)*(np.array(res_err_0)+y0*np.array(res_err_1)).transpose()
 
+np.savetxt("Init/a.txt", res_01)
+exit(0)
 
 
 i_index = np.tile(np.arange(L)+1,L)
