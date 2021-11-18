@@ -4,24 +4,15 @@ Simulated annealing schedule for the optimal control problem of NV centers in di
 
 
 ---
-### compute\_h.py
+### compute\_h.cpp
 
 The program computes the field h for the spin glass Hamiltonian. The field represents the signal to be detected.
 
-- If the output file already exists, it just quits.
-- It distinguishes between
-   - 3-chromatic signal (`tone=3`)
-   - mono-chromatic signal (`tone=1`), and in this case also the harmonic has to be specified
-
 
 ---
-### compute\_J.py
+### compute\_J.cpp
 
 The program computes the couplings J for the spin glass Hamiltonian. The couplings represent the noise to be filtered out.
-
-- If the output file already exists, it just quits.
-- If an output file for a larger system exists, it just crops it and saves.
-- Otherwise, it computes it from scratch.
 
 
 ---
