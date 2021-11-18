@@ -41,12 +41,9 @@ struct EStruct {
 #define lambda 1.       // for the exponential temperature ramp
 #define gyro 28025      // to compute eta
 
-// flux control
-#define load_Jh
-
 // global variables
 int N, tone, harmonic, ann_steps, MC_steps, MC_ramp_step; 
-double T0, K0;
+double Tfin, Delta_t, T0, K0;
 double *Js, *hs;
 
 
@@ -54,7 +51,7 @@ double *Js, *hs;
 
 void load_J() {
     char filename[100];
-    snprintf(filename, 100, "Init/J_%dspins_%dus.txt", N, N*160/1000);
+    snprintf(filename, 100, "Init/J_T%.4f_dt%.4f.txt", Tfin, Delta_t);            
     ifstream infile(filename);
         
     if ( ! infile.is_open() ) {
@@ -77,11 +74,7 @@ void load_J() {
 
 void load_h() {
     char filename[100];
-    if (tone == 3)
-        snprintf(filename, 100, "Init/h_%dtone_%dspins_%dus.txt", tone, N, N*160/1000);
-    else if (tone == 1)
-        snprintf(filename, 100, "Init/h_%dtone_%dharm_%dspins_%dus.txt", tone, harmonic, N, N*160/1000);
-    
+    snprintf(filename, 100, "Init/h_T%.4f_dt%.4f_h%d.txt", Tfin, Delta_t, harmonic);        
     ifstream infile(filename);
     
     if ( ! infile.is_open() ) {
@@ -120,11 +113,11 @@ EStruct energy(int *s){
         E.h += hs[i]*s[i];
         
         for (int j=0; j<i; j++) {
-            E.J += 2.*Js[i*N+j]*s[i]*s[j];
+            E.J += 2.*Js[abs(i-j)]*s[i]*s[j];
         }
-        // also the diagonal term matters
-        E.J += Js[i*N+i];
     }
+    // also the diagonal term matters
+    E.J += Js[0]*N;
     
     for (int i=1; i<N; i++) {
         E.K += K0*s[i-1]*s[i];
@@ -144,9 +137,9 @@ EStruct new_energy(int *s, int flip, EStruct E){
     
     // J term
     for (int i=0; i<flip; i++)
-        E_new.J -= 4*Js[i*N+flip]*s[i]*s[flip];
+        E_new.J -= 4*Js[flip-i]*s[i]*s[flip];
     for (int i=flip+1; i<N; i++){
-        E_new.J -= 4*Js[i*N+flip]*s[i]*s[flip];
+        E_new.J -= 4*Js[i-flip]*s[i]*s[flip];
     }
     
     // K term
@@ -259,10 +252,7 @@ double etaInv(double epsilon) {
 void save_s(int *s, int dw, double this_etaInv, int r) {
     // create the output file
     char filename[100];
-    if (tone == 3)
-        snprintf(filename, 100, "Configurations/s_%dtone_%dspins_%dus_K%.4f_r%d.txt", tone, N, N*160/1000, K0, r);
-    else if (tone == 1)
-        snprintf(filename, 100, "Configurations/s_%dtone_%dharm_%dspins_%dus_K%.4f_r%d.txt", tone, harmonic, N, N*160/1000, K0, r);        
+    snprintf(filename, 100, "Configurations/s_T%.4f_dt%.4f_h%d_K%.4f_r%d.txt", Tfin, Delta_t, harmonic, K0, r);        
     ofstream outfile(filename);
     
     if ( ! outfile.is_open() ) {
@@ -289,20 +279,23 @@ int main( int argc, char *argv[] ) {
     
     // parameter acquisition
     if( argc != 9 ) {
-        cerr << "\nError! Usage: ./SA <N> <tone> <harmonic> <ann_steps> <MC_steps> <Temp0> <K> <Reps>\n\n";
+        cerr << "\nError! Usage: ./SA <Tfin> <Delta_t> <harmonic> <ann_steps> <MC_steps> <Temp0> <K> <Reps>\n\n";
         exit(-1);
     }
-    N = strtod(argv[1], NULL);
-    tone = strtod(argv[2], NULL);
+    Tfin = strtof(argv[1], NULL);
+    Delta_t = strtof(argv[2], NULL);
     harmonic = strtod(argv[3], NULL);
     ann_steps = strtod(argv[4], NULL);
     MC_steps = strtod(argv[5], NULL);
     T0 = strtof(argv[6], NULL);
     K0 = strtof(argv[7], NULL);
     Reps = strtod(argv[8], NULL);
-           
+    
+    // number of spins
+    N = int(Tfin / Delta_t);
+       
     // dynamic allocation
-    Js = new double[N*N]();
+    Js = new double[N]();
     hs = new double[N]();
     s = new int[N]();
     best_s = new int[N]();
@@ -313,29 +306,12 @@ int main( int argc, char *argv[] ) {
     }
     
     // load J and h
-#ifdef load_Jh
     load_J();
-    load_h();
-#endif
-    // TEMPORARY: extract random J and h
-#ifndef load_Jh
-    for (int i=0; i<N; i++) {
-        hs[i] = randomReal(generator)*2. - 1.;
-        
-        for (int j=0; j<i; j++) {
-            Js[i*N+j] = (randomReal(generator)*2. - 1.)/N;
-            Js[j*N+i] = Js[i*N+j];
-        }
-    }
-#endif
-    
+    load_h();    
     
     // create the output file
     char filename[100];
-    if (tone == 3)
-        sprintf(filename, "Results/%dtone_%dspins_%dus_K%.4f.txt", tone, N, N*160/1000, K0);
-    else if (tone == 1)
-        sprintf(filename, "Results/%dtone_%dharm_%dspins_%dus_K%.4f.txt", tone, harmonic, N, N*160/1000, K0);
+    snprintf(filename, 100, "Results/T%.4f_dt%.4f_h%d_K%.4f.txt", Tfin, Delta_t, harmonic, K0);        
     FILE *outfile = fopen(filename, "w");  
     fprintf(outfile, "# N=%d, MC_steps=%d, T0=%f, K=%f\n# pulses 1/eta\n", N, MC_steps, T0, K0);
     
