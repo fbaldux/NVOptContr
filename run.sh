@@ -13,21 +13,21 @@ T0=0.1       # initial temperature
 Reps=1       # number of states to sample
 
 
-if make compute_J;
+if g++ -o compute_J compute_J.cpp -lm
 then
     ./compute_J $Tfin $Delta_t
     echo "J done"
 fi
 
 
-if make compute_h;
+if g++ -o compute_h compute_h.cpp -lm
 then
     ./compute_h $Tfin $Delta_t $harmonic
     echo "h done"    
 fi
 
 
-if make SA;
+if g++ -o SA SA.cpp -lm
 then
     for K in 1e-4 5e-4 1e-3 5e-3 1e-2;
     do

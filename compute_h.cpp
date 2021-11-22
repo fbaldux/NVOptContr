@@ -80,7 +80,7 @@ int main( int argc, char *argv[] ) {
     
     // integration: it can be done analytically for monochromatic signals
     for (int k=1; k<=N; k++) {
-        hs[k] = ( integrated_signal(k*Delta_t) - integrated_signal((k-1)*Delta_t) ) / Tfin;
+        hs[k-1] = ( integrated_signal(k*Delta_t) - integrated_signal((k-1)*Delta_t) ) / Tfin;
     }
     
     
