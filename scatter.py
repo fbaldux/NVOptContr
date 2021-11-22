@@ -14,16 +14,12 @@ instring = input("").split(' ')
 
 T = float( instring[0] )
 deltat = float( instring[1] )  
-tone = int( instring[2] ) 
-harmonic = int( instring[3] ) 
+harmonic = int( instring[2] ) 
 
 L = int(T/deltat)
 
 def filename_func():
-    if tone==3:
-        return "Results/3tone_%dspins_%dus_K?.????.txt" % (L,T)
-    if tone==1:
-        return "Results/1tone_%dharm_%dspins_%dus_K?.????.txt" % (harmonic,L,T)
+    return "Results/T%.4f_dt%.4f_h%d_K?.????.txt" % (T, deltat, harmonic)
 
 files = glob(filename_func())
 Ks = np.array([float(f[-10:-4]) for f in files])
@@ -38,10 +34,7 @@ for k in range(len(files)):
 plt.xlabel("# of pulses")
 plt.ylabel(r"1/$\eta$")
 
-if tone==3:
-    plt.title(r"$T=%.2f \mu$s, trichromatic signal" % T)
-elif tone==1:
-    plt.title(r"$T=%.2f \mu$s, monochromatic signal" % T)
+plt.title(r"$T=%.2f \mu$s, monochromatic signal" % T)
 
 plt.legend()
 plt.show()
