@@ -10,6 +10,7 @@
     - The configurations found are saved to Configurations/, with the # of pulses and 1/eta
       in the header.
     - The # of pulses and 1/eta for each configuration are saved to a file in Results/
+    – TRYING TO PUT DOMAIN WALL MOVES
     
 //  -------------------------------------------------------------------------------------------  */
 
@@ -20,6 +21,7 @@
 #include <fstream>
 #include <cmath>
 #include <random>
+#include <vector>
 
 using namespace std;
 
@@ -188,47 +190,6 @@ double acceptance_prob(double deltaE, double T) {
 }
 
 
-//  ------------------------------------  annealing cycle  ------------------------------------  //
-
-void anneal(int *s, int *best_s, EStruct *E){
-    
-    // initial energy
-    *E = energy(s);
-    double best_E = E->tot;
-    
-    // gradually decrease the temperature
-    for (int n=1; n<ann_steps; n++) {
-        
-        double T = temperature(n);
-        
-        // equilibrate at fixed temperature
-        for (int t=0; t<MC_steps; t++) {
-        
-            // flip a spin in s_new
-            int flip = randomReal(generator)*N;
-        
-            // find the new energy efficiently
-            EStruct E_new = new_energy(s, flip, *E);
-        
-            // assess the move
-            double coin = randomReal(generator);
-            if (coin<acceptance_prob(E_new.tot-E->tot,T)) {
-                s[flip] = -s[flip];
-                *E = E_new;
-            }
-        
-            // keep track of the best configuration so far
-            if (E->tot < best_E) {
-                best_E = E->tot;
-                copy_s(s, best_s);
-            }
-        }
-    }
-    
-    *E = energy(best_s);
-}
-
-
 //  ---------------------------------  analyze configuration  ---------------------------------  //
 
 // count the domain walls
@@ -269,6 +230,111 @@ void save_s(int *s, int dw, double this_etaInv, int r) {
     
     outfile.close();
 }
+
+
+//  ------------------------------------  annealing cycle  ------------------------------------  //
+
+void anneal(int *s, int *best_s, EStruct *E){
+    // initial energy
+    *E = energy(s);
+    double best_E = E->tot;
+    
+    // gradually decrease the temperature
+    for (int n=1; n<ann_steps; n++) {
+        
+        double T = temperature(n);
+        
+        // equilibrate at fixed temperature
+        for (int t=0; t<MC_steps; t++) {
+        
+            // flip a spin in s_new
+            int flip = randomReal(generator)*N;
+        
+            // find the new energy       
+            EStruct E_new = new_energy(s, flip, *E);
+        
+            // assess the move
+            double coin = randomReal(generator);
+            if (coin<acceptance_prob(E_new.tot-E->tot,T)) {
+                s[flip] = -s[flip];
+                *E = E_new;
+            }
+        
+            //cout << E->tot << endl;
+            
+            // keep track of the best configuration so far
+            if (E->tot < best_E) {
+                best_E = E->tot;
+                copy_s(s, best_s);
+            }
+        }
+    }
+    
+    // prepare for the DW cycle of annealing
+    copy_s(best_s,s);
+    *E = energy(best_s);
+    
+    // save configuration to file
+    int dw = domain_walls(best_s);
+    double this_etaInv = etaInv(E->tot+E->K);
+    save_s(best_s, dw, this_etaInv, 0);
+    
+    // find the domain walls
+    vector<int> DW;
+    for (int i=0; i<N-1; i++) {
+        if (s[i] == -s[i+1]) {
+            DW.push_back(i);
+        }
+    }
+    
+    // gradually decrease the temperature
+    for (int n=ann_steps/2; n<ann_steps; n++) {
+        
+        double T = temperature(n);
+        
+        // move around the domain walls
+        for (int t=0; t<MC_steps; t++) {
+    
+            // pick a domain wall
+            int DW_ind = randomReal(generator)*DW.size();
+            int flip = DW.at(DW_ind);
+        
+            // choose to move it left (0) or right (1)
+            int direction = randomBit(generator);
+            flip += direction;
+        
+            // find the new energy       
+            EStruct E_new = new_energy(s, flip, *E);
+    
+            // assess the move
+            double coin = randomReal(generator);
+            if (coin<acceptance_prob(E_new.tot-E->tot,0)) {
+                s[flip] = -s[flip];
+                *E = E_new;
+                DW.at(DW_ind) += 2*direction-1;
+                cout << "eureka2\n";
+            }
+            //cout << "eureka\n";
+        
+            //cout << E->tot << endl;
+    
+            // keep track of the best configuration so far
+            if (E->tot < best_E) {
+                best_E = E->tot;
+                copy_s(s, best_s);
+            }
+        }
+    }
+    
+    *E = energy(best_s);
+    
+    // save data
+    dw = domain_walls(best_s);
+    this_etaInv = etaInv(E->tot+E->K);
+    // save configuration to file
+    save_s(best_s, dw, this_etaInv, 1);
+}
+
 
 
 //  ------------------------------------------  main  -----------------------------------------  //

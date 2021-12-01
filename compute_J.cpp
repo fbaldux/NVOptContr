@@ -102,6 +102,15 @@ int main( int argc, char *argv[] ) {
     N = int(Tfin / Delta_t);
     
     
+    // check if file already exists
+    char filename[100];
+    snprintf(filename, 100, "Init/J_T%.4f_dt%.4f.txt", Tfin, Delta_t); 
+    ifstream outfile(filename);
+    if (outfile) {
+        exit(0);
+    } 
+    
+    
     // dynamic allocation
     double *Js = new double[N]();   
     if (Js==NULL) {

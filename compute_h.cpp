@@ -66,9 +66,22 @@ int main( int argc, char *argv[] ) {
     Delta_t = strtof(argv[2], NULL);
     tone = strtod(argv[3], NULL);    
     harmonic = strtod(argv[4], NULL);    
+
+    // if tritone, set harmonic=0 by default
+    if (tone==3)
+        harmonic = 0;
     
     // number of spins
     N = int(Tfin / Delta_t);
+    
+    
+    // check if file already exists
+    char filename[100];
+    snprintf(filename, 100, "Init/h_T%.4f_dt%.4f_t%d_h%d.txt", Tfin, Delta_t, tone, harmonic); 
+    ifstream outfile(filename);
+    if (outfile) {
+        exit(0);
+    } 
     
     
     // dynamic allocation
@@ -87,10 +100,7 @@ int main( int argc, char *argv[] ) {
             hs[k-1] = ( integ_mono(1.,omega0,k*Delta_t) - integ_mono(1.,omega0,(k-1)*Delta_t) ) / Tfin;
         }
     }
-    else if (tone==3) {
-        // if tritone, set harmonic=0 by default
-        harmonic = 0;
-        
+    else if (tone==3) {        
         double A0 = 0.065*0.2+1./5; 
         double omega0 = 0.1150;
         double A1 = 0.237*0.2+1./5; 
