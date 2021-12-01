@@ -1,8 +1,5 @@
 Tfin=160.       # final time of the experiments
 Delta_t=0.16       # pi-pulse distance
-#integer N=$((Tfin/delta_t))       # number of spins
-#echo $N
-#N=955
 
 tone=3       # monochromatic or trichromatic
 harmonic=5       # number of the harmonic (only for the monochromatic signal)
@@ -33,7 +30,7 @@ then
     for K in 5e-4 1e-3 5e-3 1e-2;
     do
         ./SA $Tfin $Delta_t $tone $harmonic $annSteps $MCsteps $T0 $K $Reps &
-        echo "N $N tone $tone harm $harmonic annSteps $annSteps MCsteps $MCsteps T0 $T0 K $K Reps $Reps --> pid $!" >> log.txt
+        echo Tf $Tfin, dt $Delta_t, tone $tone, harm $harmonic, annSt $annSteps, MCst $MCsteps, T0 $T0, K $K, rep $Reps, pid $! >> log.txt
     done
     wait 
     echo "SA done"  
