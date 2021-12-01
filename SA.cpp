@@ -74,7 +74,7 @@ void load_J() {
 
 void load_h() {
     char filename[100];
-    snprintf(filename, 100, "Init/h_T%.4f_dt%.4f_h%d.txt", Tfin, Delta_t, harmonic);        
+    snprintf(filename, 100, "Init/h_T%.4f_dt%.4f_t%d_h%d.txt", Tfin, Delta_t, tone, harmonic);        
     ifstream infile(filename);
     
     if ( ! infile.is_open() ) {
@@ -243,7 +243,7 @@ int domain_walls(int *s) {
 
 // sensitivity
 double etaInv(double epsilon) {
-    return 1./exp(epsilon - log(gyro)-0.5*log(N*0.16*1e-6));
+    return 1./exp(epsilon - log(gyro)-0.5*log(N*Delta_t*1e-6));
 }
 
 
@@ -252,7 +252,7 @@ double etaInv(double epsilon) {
 void save_s(int *s, int dw, double this_etaInv, int r) {
     // create the output file
     char filename[100];
-    snprintf(filename, 100, "Configurations/s_T%.4f_dt%.4f_h%d_K%.4f_r%d.txt", Tfin, Delta_t, harmonic, K0, r);        
+    snprintf(filename, 100, "Configurations/s_T%.4f_dt%.4f_t%d_h%d_K%.4f_r%d.txt", Tfin, Delta_t, tone, harmonic, K0, r);        
     ofstream outfile(filename);
     
     if ( ! outfile.is_open() ) {
@@ -278,18 +278,27 @@ int main( int argc, char *argv[] ) {
     EStruct E;
     
     // parameter acquisition
-    if( argc != 9 ) {
-        cerr << "\nError! Usage: ./SA <Tfin> <Delta_t> <harmonic> <ann_steps> <MC_steps> <Temp0> <K> <Reps>\n\n";
+    if( argc != 10 ) {
+        cerr << "\nError! Usage: ./SA <Tfin> <Delta_t> <tone> <harmonic> <ann_steps> <MC_steps> <Temp0> <K> <Reps>\n\n";
         exit(-1);
     }
     Tfin = strtof(argv[1], NULL);
     Delta_t = strtof(argv[2], NULL);
-    harmonic = strtod(argv[3], NULL);
-    ann_steps = strtod(argv[4], NULL);
-    MC_steps = strtod(argv[5], NULL);
-    T0 = strtof(argv[6], NULL);
-    K0 = strtof(argv[7], NULL);
-    Reps = strtod(argv[8], NULL);
+    tone = strtod(argv[3], NULL);
+    harmonic = strtod(argv[4], NULL);
+    ann_steps = strtod(argv[5], NULL);
+    MC_steps = strtod(argv[6], NULL);
+    T0 = strtof(argv[7], NULL);
+    K0 = strtof(argv[8], NULL);
+    Reps = strtod(argv[9], NULL);
+    
+    // if tritone, set harmonic=0 by default
+    if ( tone == 3 )
+        harmonic = 0;
+    else if ( tone != 1 ) {
+        cerr << "\nError! Unrecognized tone value.\n\n";
+        exit(-1);
+    }
     
     // number of spins
     N = int(Tfin / Delta_t);
@@ -311,7 +320,7 @@ int main( int argc, char *argv[] ) {
     
     // create the output file
     char filename[100];
-    snprintf(filename, 100, "Results/T%.4f_dt%.4f_h%d_K%.4f.txt", Tfin, Delta_t, harmonic, K0);        
+    snprintf(filename, 100, "Results/T%.4f_dt%.4f_t%d_h%d_K%.4f.txt", Tfin, Delta_t, tone, harmonic, K0);        
     FILE *outfile = fopen(filename, "w");  
     fprintf(outfile, "# N=%d, MC_steps=%d, T0=%f, K=%f\n# pulses 1/eta\n", N, MC_steps, T0, K0);
     
