@@ -1,14 +1,14 @@
 Tfin=160.       # final time of the experiments
 Delta_t=0.16       # pi-pulse distance
 
-tone=3       # monochromatic or trichromatic
+tone=1       # monochromatic or trichromatic
 harmonic=5       # number of the harmonic (only for the monochromatic signal)
 
 annSteps=1e3       # number of steps in the temperature ramp
 MCsteps=5e2       # number of MC steps at each ramp level
 T0=0.1       # initial temperature
 #K=0.002       # ferromagnetic coupling
-Reps=10       # number of states to sample
+Reps=1       # number of states to sample
 
 
 if g++ -o compute_J compute_J.cpp -lm
@@ -38,3 +38,4 @@ fi
     
 
 #echo $Tfin $delta_t $tone $harmonic | python3 scatter.py &
+rm compute_J compute_h SA
