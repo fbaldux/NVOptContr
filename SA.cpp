@@ -5,7 +5,7 @@
 
         H = sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - K sum_i s[i] s[i+1]
 
-    - The variables J[i,j] and h[i] are loaded from a file.
+    - The variables J[i,j] and h[i] are loaded from Init/
     - The energy is computed efficiently at each step.
     - The configurations found are saved to Configurations/, with the # of pulses and 1/eta
       in the header.

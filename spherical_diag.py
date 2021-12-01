@@ -5,6 +5,7 @@
 #       H = sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - sum_i s[i]**2
 #
 #   - The variables `J[i,j]` and `h[i]` are loaded from Init/
+#   - Exact diagonalization is used instead of the FFT.
 #   - From the continuous spins are generated Ising spins s_Ising[i] = sign(s[i]), that are 
 #     then saved to Configurations/, with the # of pulses and 1/eta in the header.
 #
@@ -13,7 +14,7 @@
 
 import sys
 import numpy as np
-from scipy.linalg import toeplitz
+from scipy.linalg import toeplitz,eigh
 from scipy.fft import fft,ifft
 from scipy.optimize import brentq
 from matplotlib import pyplot as plt
@@ -38,28 +39,27 @@ elif tone != 1:
 J = np.loadtxt("Init/J_T%.4f_dt%.4f.txt" % (Tfin,Delta_t))
 Jmat = toeplitz(J)
 
-# to have decay both for positive and negative indices
-#J[N//2+1:] = np.flip(J[1:N//2])
 
 h = np.loadtxt("Init/h_T%.4f_dt%.4f_t%d_h%d.txt" % (Tfin,Delta_t,tone,harmonic))
 
 
 #  ------------------------------------  Fourier transform  ------------------------------------  #
 
-hF = fft(h, norm='ortho')
-JF = fft(J, norm='ortho')
+JD, U = eigh(Jmat)
+
+hD = np.dot( np.conj(U.T), h ) 
 
 
 #  ---------------------------------  functions for S.P. eqs.  ---------------------------------  #
 
 # l.h.s. of the equation
 def lhsTemp(lamda):
-    return np.sum( np.abs( hF / (JF + lamda) )**2 )
+    return np.sum( ( hD / (JD + lamda) )**2 )
 lhs = np.vectorize(lhsTemp)
 
 # r.h.s. of the equation
 def rhsTemp(lamda):
-    return N * np.abs( np.sum( np.abs(hF)**2 / (JF + lamda) ) )
+    return N * np.abs( np.sum( hD**2 / (JD + lamda) ) )
 rhs = np.vectorize(rhsTemp)
 
 # combined equation
@@ -83,20 +83,16 @@ lamda = brentq(equation, a, b)
 
 #  -------------------------------  transform back to real space  ------------------------------  #
 
-# non-ortho
-#C = np.sqrt( N * np.sum( np.abs(hF)**2/(JF+lamda) ) )
-#sF = N*hF / (C*(JF+lamda))
+C = np.sqrt( np.sum( hD**2/(JD+lamda) ) )
+sD = hD / ( C*(JD+lamda) )
 
-# ortho
-C = np.sqrt( np.sum( np.abs(hF)**2/(JF+lamda) ) )
-sF = hF / ( C*(JF+lamda) )
-
-s = ifft(sF, norm='ortho').real
+s = np.dot(U,sD).real
 
 s_Ising = np.sign(s).astype(np.int_)
 
 
 #  -------------------------------------------  plot  ------------------------------------------  #
+
 """
 s_ann = np.loadtxt("Configurations/s_T%.4f_dt%.4f_t%d_h%d_K0.0050_r0.txt" % (Tfin,Delta_t,tone,harmonic))
 
@@ -114,6 +110,7 @@ plt.legend()
 plt.show()
 exit(0)
 """
+
 #  ------------------------------------  sensitivity & co.  ------------------------------------  #
 
 def energy(s):
@@ -129,7 +126,7 @@ def etaInv(epsilon):
 
 #  ---------------------------------------  save to file  --------------------------------------  #
 
-filename = "Configurations/sSpher_T%.4f_dt%.4f_t%d_h%d.txt" % (Tfin,Delta_t,tone,harmonic)
+filename = "Configurations/sSpherD_T%.4f_dt%.4f_t%d_h%d.txt" % (Tfin,Delta_t,tone,harmonic)
 head = "pulses=%d, 1/eta=%f" % (domain_walls(s_Ising), etaInv(energy(s_Ising)))
 np.savetxt(filename, s_Ising, header=head, fmt='%d')
 

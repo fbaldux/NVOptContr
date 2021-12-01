@@ -29,7 +29,7 @@ The program anneals a random configuration of Ising spins `s[i]=+/-1`, according
    
       H = sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - K sum_i s[i] s[i+1]
 
-- The variables `J[i,j]` and `h[i]` are loaded from a file.
+- The variables `J[i,j]` and `h[i]` are loaded from Init/
 - The energy is computed efficiently at each step.
 - The configurations found are saved to Configurations/, with the # of pulses and 1/eta in the header.
 - The # of pulses and 1/eta for each configuration are saved to a file in Results/
@@ -39,3 +39,42 @@ The program anneals a random configuration of Ising spins `s[i]=+/-1`, according
 ### scatter.py
 
 Given the final time and tone, the program plots the sensitivities for all the values of K found in Results/
+
+
+---
+### spherical.py
+
+The program finds the configuration of _continuous_ spins `s[i]` that minimezes the cost function
+   
+      H = sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - sum_i s[i]**2
+
+- The variables `J[i,j]` and `h[i]` are loaded from Init/
+- From the continuous spins are generated _Ising_ spins `s_Ising[i] = sign(s[i])`, that are then saved to Configurations/, with the # of pulses and 1/eta in the header.
+
+
+---
+### spherical\_diag.py
+
+The program finds the configuration of _continuous_ spins `s[i]` that minimezes the cost function
+   
+      H = sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - sum_i s[i]**2
+
+- The variables `J[i,j]` and `h[i]` are loaded from Init/
+- Exact diagonalization is used instead of the FFT.
+- From the continuous spins are generated _Ising_ spins `s_Ising[i] = sign(s[i])`, that are then saved to Configurations/, with the # of pulses and 1/eta in the header.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
