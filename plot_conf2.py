@@ -26,7 +26,8 @@ elif tone != 1:
     sys.stderr.write("\nError! Unrecognized tone value.\n\n")
     exit(-1)
 
-plt.rcParams.update({"text.usetex": True, "font.family": "serif", "font.size": 16})
+#plt.rcParams.update({"text.usetex": True, "font.family": "serif", "font.size": 16})
+#plt.rcParams["figure.figsize"] = [5,5]
 fig, ax = plt.subplots()
 
 #  ------------------------------------------  import  -----------------------------------------  #
@@ -46,6 +47,7 @@ def grep_header(filename):
     
     return pulse, eta
 
+s = []
 pulses = []
 etas = []
 
@@ -55,10 +57,7 @@ while not stop:
     
     try:
         filename = "Configurations/s_T%.4f_dt%.4f_t%d_h%d_K%.4f_r%d.txt" % (Tfin,Delta_t,tone,harmonic,K,r)
-        s = np.loadtxt(filename)
-        
-        s_nz = np.nonzero(np.diff(s))[0]
-        ax.plot(s_nz, (r+1)*np.ones(len(s_nz)), 'o', c='black', ms=4)
+        s.append( np.loadtxt(filename) )
         
         r += 1
         
@@ -73,23 +72,41 @@ while not stop:
 
 
 filename = "Configurations/sSpher_T%.4f_dt%.4f_t%d_h%d.txt" % (Tfin,Delta_t,tone,harmonic)
-s = np.loadtxt(filename)
-
-s_nz = np.nonzero(np.diff(s))[0]
-ax.plot(s_nz, np.zeros(len(s_nz)), 'o', c='firebrick', ms=4)
+s.insert( 0, np.loadtxt(filename) )
 
 # grep eta
 pulse, eta = grep_header(filename)
 pulses.insert( 0, pulse )
 etas.insert( 0, eta )
 
-ax.set_xlabel(r"$i$")
-ax.set_yticks(np.arange(r+1), labels=[r"spher."]+[r"SA$_{%d}$"%(i+1) for i in range(r)])
+
+s = np.array(s)
+scal = np.diag(np.ones(r+1))
+
+for i in range(r+1):
+    for j in range(i):
+        scal[i,j] = np.dot(s[i],s[j]) / N
+        scal[j,i] = scal[i,j]
+
+ax.tick_params(axis='y', left='True', right='True')
+
+im = ax.imshow(scal, cmap='inferno', aspect=1)
+cbar = ax.figure.colorbar(im, ax=ax, pad=0.12)
+
+
+labs = [r"Sph."]+[r"SA$_{%d}$"%(i+1) for i in range(r)]
+ax.set_xticks(np.arange(r+1), labels=labs)
+ax.set_yticks(np.arange(r+1), labels=labs)
 
 ax2 = ax.twinx()
-ax2.set_yticks(np.arange(r+1)+0.5, labels=["%.2f"%e for e in etas])
+ax2.set_ylim(ax.get_ylim())
+ax2.set_yticks(np.arange(r+1), labels=["%.2f"%e for e in etas[::-1]])
 
 ax.text(1.03, 1.05, r"$1/\eta$", transform=ax.transAxes)
+
+#cbar.ax.set_ylabel(cbarlabel, rotation=-90, va="bottom")
+
+ax.set_title(r"scalar product $\vec{s} \cdot \vec{s}'$")
 
 plt.show()
 

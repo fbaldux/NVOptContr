@@ -6,11 +6,13 @@
         H = sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - K sum_i s[i] s[i+1]
 
     - The variables J[i,j] and h[i] are loaded from Init/
+    - The initial configuration is given by the output of spherical.py, i.e. the spherical
+      model solution.
+    – The only allowed MC moves are domain wall shifts.
     - The energy is computed efficiently at each step.
     - The configurations found are saved to Configurations/, with the # of pulses and 1/eta
       in the header.
     - The # of pulses and 1/eta for each configuration are saved to a file in Results/
-    – TRYING TO PUT DOMAIN WALL MOVES
     
 //  -------------------------------------------------------------------------------------------  */
 
@@ -49,7 +51,7 @@ double Tfin, Delta_t, T0, K0;
 double *Js, *hs;
 
 
-//  --------------------------------------  load h and J  -------------------------------------  //
+//  ------------------------------------  load h, J and s  ------------------------------------  //
 
 void load_J() {
     char filename[100];
@@ -91,6 +93,29 @@ void load_h() {
     double hi;
     while (infile >> hi) {
         hs[i++] = hi;
+    }
+
+    infile.close();
+}
+
+
+void load_s(int *s) {
+    char filename[100];
+    snprintf(filename, 100, "Configurations/sSpher_T%.4f_dt%.4f_t%d_h%d.txt", Tfin, Delta_t, tone, harmonic);         
+    ifstream infile(filename);
+    
+    if ( ! infile.is_open() ) {
+        cerr << "\nError! No input file.\n\n" << endl;
+        exit(-1);
+    }
+    
+    // skipping the header
+    infile.ignore(1000,'\n');
+    
+    int i=0;
+    double si;
+    while (infile >> si) {
+        s[i++] = si;
     }
 
     infile.close();
@@ -190,6 +215,60 @@ double acceptance_prob(double deltaE, double T) {
 }
 
 
+//  ------------------------------------  annealing cycle  ------------------------------------  //
+
+void anneal(int *s, int *best_s, EStruct *E){
+    // initial energy
+    *E = energy(s);
+    double best_E = E->tot;    
+    
+    // find the domain walls
+    vector<int> DW;
+    for (int i=0; i<N-1; i++) {
+        if (s[i] == -s[i+1]) {
+            DW.push_back(i);
+        }
+    }
+    
+    // gradually decrease the temperature
+    for (int n=0; n<ann_steps; n++) {
+        
+        double T = temperature(n);
+        
+        // move around the domain walls
+        for (int t=0; t<MC_steps; t++) {
+    
+            // pick a domain wall
+            int DW_ind = randomReal(generator)*DW.size();
+            int flip = DW.at(DW_ind);
+        
+            // choose to move it left (0) or right (1)
+            int direction = randomBit(generator);
+            flip += direction;
+        
+            // find the new energy       
+            EStruct E_new = new_energy(s, flip, *E);
+    
+            // assess the move
+            double coin = randomReal(generator);
+            if (coin<acceptance_prob(E_new.tot-E->tot,0)) {
+                s[flip] = -s[flip];
+                *E = E_new;
+                DW.at(DW_ind) += 2*direction-1;
+            }
+            
+            // keep track of the best configuration so far
+            if (E->tot < best_E) {
+                best_E = E->tot;
+                copy_s(s, best_s);
+            }
+        }
+    }
+    
+    *E = energy(best_s);   
+}
+
+
 //  ---------------------------------  analyze configuration  ---------------------------------  //
 
 // count the domain walls
@@ -232,111 +311,6 @@ void save_s(int *s, int dw, double this_etaInv, int r) {
 }
 
 
-//  ------------------------------------  annealing cycle  ------------------------------------  //
-
-void anneal(int *s, int *best_s, EStruct *E){
-    // initial energy
-    *E = energy(s);
-    double best_E = E->tot;
-    
-    // gradually decrease the temperature
-    for (int n=1; n<ann_steps; n++) {
-        
-        double T = temperature(n);
-        
-        // equilibrate at fixed temperature
-        for (int t=0; t<MC_steps; t++) {
-        
-            // flip a spin in s_new
-            int flip = randomReal(generator)*N;
-        
-            // find the new energy       
-            EStruct E_new = new_energy(s, flip, *E);
-        
-            // assess the move
-            double coin = randomReal(generator);
-            if (coin<acceptance_prob(E_new.tot-E->tot,T)) {
-                s[flip] = -s[flip];
-                *E = E_new;
-            }
-        
-            //cout << E->tot << endl;
-            
-            // keep track of the best configuration so far
-            if (E->tot < best_E) {
-                best_E = E->tot;
-                copy_s(s, best_s);
-            }
-        }
-    }
-    
-    // prepare for the DW cycle of annealing
-    copy_s(best_s,s);
-    *E = energy(best_s);
-    
-    // save configuration to file
-    int dw = domain_walls(best_s);
-    double this_etaInv = etaInv(E->tot+E->K);
-    save_s(best_s, dw, this_etaInv, 0);
-    
-    // find the domain walls
-    vector<int> DW;
-    for (int i=0; i<N-1; i++) {
-        if (s[i] == -s[i+1]) {
-            DW.push_back(i);
-        }
-    }
-    
-    // gradually decrease the temperature
-    for (int n=ann_steps/2; n<ann_steps; n++) {
-        
-        double T = temperature(n);
-        
-        // move around the domain walls
-        for (int t=0; t<MC_steps; t++) {
-    
-            // pick a domain wall
-            int DW_ind = randomReal(generator)*DW.size();
-            int flip = DW.at(DW_ind);
-        
-            // choose to move it left (0) or right (1)
-            int direction = randomBit(generator);
-            flip += direction;
-        
-            // find the new energy       
-            EStruct E_new = new_energy(s, flip, *E);
-    
-            // assess the move
-            double coin = randomReal(generator);
-            if (coin<acceptance_prob(E_new.tot-E->tot,0)) {
-                s[flip] = -s[flip];
-                *E = E_new;
-                DW.at(DW_ind) += 2*direction-1;
-                cout << "eureka2\n";
-            }
-            //cout << "eureka\n";
-        
-            //cout << E->tot << endl;
-    
-            // keep track of the best configuration so far
-            if (E->tot < best_E) {
-                best_E = E->tot;
-                copy_s(s, best_s);
-            }
-        }
-    }
-    
-    *E = energy(best_s);
-    
-    // save data
-    dw = domain_walls(best_s);
-    this_etaInv = etaInv(E->tot+E->K);
-    // save configuration to file
-    save_s(best_s, dw, this_etaInv, 1);
-}
-
-
-
 //  ------------------------------------------  main  -----------------------------------------  //
 
 int main( int argc, char *argv[] ) {
@@ -344,8 +318,8 @@ int main( int argc, char *argv[] ) {
     EStruct E;
     
     // parameter acquisition
-    if( argc != 10 ) {
-        cerr << "\nError! Usage: ./SA <Tfin> <Delta_t> <tone> <harmonic> <ann_steps> <MC_steps> <Temp0> <K> <Reps>\n\n";
+    if( argc != 9 ) {
+        cerr << "\nError! Usage: ./SA <Tfin> <Delta_t> <tone> <harmonic> <ann_steps> <MC_steps> <Temp0> <Reps>\n\n";
         exit(-1);
     }
     Tfin = strtof(argv[1], NULL);
@@ -355,8 +329,8 @@ int main( int argc, char *argv[] ) {
     ann_steps = strtod(argv[5], NULL);
     MC_steps = strtod(argv[6], NULL);
     T0 = strtof(argv[7], NULL);
-    K0 = strtof(argv[8], NULL);
-    Reps = strtod(argv[9], NULL);
+    K0 = 0;
+    Reps = strtod(argv[8], NULL);
     
     // if tritone, set harmonic=0 by default
     if ( tone == 3 )
@@ -382,8 +356,9 @@ int main( int argc, char *argv[] ) {
     
     // load J and h
     load_J();
-    load_h();    
-    
+    load_h();
+        
+ 
     // create the output file
     char filename[100];
     snprintf(filename, 100, "Results/T%.4f_dt%.4f_t%d_h%d_K%.4f.txt", Tfin, Delta_t, tone, harmonic, K0);        
@@ -393,11 +368,9 @@ int main( int argc, char *argv[] ) {
     
     // perform many annealing cycles
     for (int r=0; r<Reps; r++) {
-        // initial random state
-        for (int i=0; i<N; i++) {
-            s[i] = randomBit(generator)*2 - 1;
-        }
-
+        // initial state from spherical model solution
+        load_s(s);
+        
         // anneal the state s to best_s
         anneal(s, best_s, &E);
         
