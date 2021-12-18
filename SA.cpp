@@ -19,10 +19,13 @@
 #include <cstdio>
 #include <iomanip>
 #include <fstream>
+#include <chrono>
 #include <cmath>
 #include <random>
 
 using namespace std;
+typedef std::chrono::high_resolution_clock Clock;
+
 
 // random number generator
 random_device seed; // obtain a random number from hardware
@@ -326,6 +329,9 @@ int main( int argc, char *argv[] ) {
     fprintf(outfile, "# N=%d, MC_steps=%d, T0=%f, K=%f\n# pulses 1/eta\n", N, MC_steps, T0, K0);
     
     
+    // time control
+    auto time_in = Clock::now();
+    
     // perform many annealing cycles
     for (int r=0; r<Reps; r++) {
         // initial random state
@@ -346,6 +352,11 @@ int main( int argc, char *argv[] ) {
         fflush(0);
     }
     
+    // final time
+    auto time_fin = Clock::now();
+    double elap = double(std::chrono::duration_cast<std::chrono::nanoseconds>(time_fin-time_in).count()) * 1e-9;
+    std::cout << "Time per annealing cycle: " << elap/Reps << " s" << std::endl;
+    
     // close the files 
     fclose(outfile);
     
@@ -356,5 +367,5 @@ int main( int argc, char *argv[] ) {
     free(s);
     free(best_s);
     
-    return 0;
+    return EXIT_SUCCESS;
 }
