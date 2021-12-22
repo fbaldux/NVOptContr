@@ -2,7 +2,7 @@
 #   
 #   The program finds the configuration of continuous spins s[i] that minimezes the cost function
 #       
-#       H = sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - sum_i s[i]**2
+#       H = 0.5 sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - sum_i s[i]**2
 #
 #   - The variables `J[i,j]` and `h[i]` are loaded from Init/
 #   - Exact diagonalization is used instead of the FFT.

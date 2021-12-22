@@ -3,11 +3,11 @@ function mytime() {
     #echo "from time import time; print(time())"| python
 }
 
-Tfin=160.       # final time of the experiments
+Tfin=32.       # final time of the experiments
 Delta_t=0.16       # pi-pulse distance
 
 tone=3       # monochromatic or trichromatic
-harmonic=5       # number of the harmonic (only for the monochromatic signal)
+harmonic=0       # number of the harmonic (only for the monochromatic signal)
 
 annSteps=1e3       # number of steps in the temperature ramp
 MCsteps=1e2       # number of MC steps at each ramp level
@@ -17,16 +17,16 @@ Reps=10       # number of states to sample
 
 time0=$(mytime)
 
-if g++ -o compute_J compute_J.cpp -lm
+if g++ -o J_experiment J_experiment.cpp -lm
 then
-    ./compute_J $Tfin $Delta_t
+    ./J_experiment $Tfin $Delta_t
     echo "J done" $( echo "$(mytime) - $time0" | bc -l )
 fi
 
 
-if g++ -o compute_h compute_h.cpp -lm
+if g++ -o h_experiment h_experiment.cpp -lm
 then
-    ./compute_h $Tfin $Delta_t $tone $harmonic
+    ./h_experiment $Tfin $Delta_t $tone $harmonic
     echo "h done" $( echo "$(mytime) - $time0" | bc -l )
 fi
 
@@ -41,9 +41,9 @@ then
     wait 
     echo "SA done" $( echo "$(mytime) - $time0" | bc -l )
 fi
-rm compute_J compute_h SA
+rm J_experiment h_experiment SA
 
-#python3 scatter.py $Tfin $Delta_t $tone $harmonic &
+python3 scatter.py $Tfin $Delta_t $tone $harmonic &
 
 
 

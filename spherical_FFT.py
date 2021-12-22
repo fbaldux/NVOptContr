@@ -2,7 +2,7 @@
 #   
 #   The program finds the configuration of continuous spins s[i] that minimezes the cost function
 #       
-#       H = sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - sum_i s[i]**2
+#       H = 0.5 sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - sum_i s[i]**2
 #
 #   - The variables `J[i,j]` and `h[i]` are loaded from Init/
 #   - From the continuous spins are generated Ising spins s_Ising[i] = sign(s[i]), that are 
@@ -17,6 +17,7 @@ from scipy.linalg import toeplitz
 from scipy.fft import fft,ifft
 from scipy.optimize import brentq
 from matplotlib import pyplot as plt
+from time import time
 
 
 Tfin = float( sys.argv[1] )
@@ -45,6 +46,8 @@ h = np.loadtxt("Init/h_T%.4f_dt%.4f_t%d_h%d.txt" % (Tfin,Delta_t,tone,harmonic))
 
 
 #  ------------------------------------  Fourier transform  ------------------------------------  #
+
+start = time()
 
 hF = fft(h, norm='ortho')
 JF = fft(J, norm='ortho')
@@ -95,6 +98,7 @@ s = ifft(sF, norm='ortho').real
 
 s_Ising = np.sign(s).astype(np.int_)
 
+#print(time()-start)
 
 #  -------------------------------------------  plot  ------------------------------------------  #
 """
@@ -117,7 +121,7 @@ exit(0)
 #  ------------------------------------  sensitivity & co.  ------------------------------------  #
 
 def energy(s):
-    return np.einsum("a,ab,b", s, Jmat, s) - np.log( np.abs( np.dot(h,s) ) )
+    return 0.5*np.einsum("a,ab,b", s, Jmat, s) - np.log( np.abs( np.dot(h,s) ) )
 
 def domain_walls(s):
     #return (N - np.dot(s[:-1],s[1:]) - 1) // 2
@@ -136,7 +140,7 @@ np.savetxt(filename, s_Ising, header=head, fmt='%d')
 
 
 
-
+print(Delta_t, etaInv(energy(s)), etaInv(energy(s_Ising)))
 
 
 

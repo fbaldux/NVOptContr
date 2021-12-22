@@ -16,34 +16,32 @@ Reps=10       # number of states to sample
 
 time0=$(mytime)
 
-if g++ -o compute_J compute_J.cpp -lm
+if g++ -o J_experiment J_experiment.cpp -lm
 then
-    ./compute_J $Tfin $Delta_t
+    ./J_experiment $Tfin $Delta_t
     echo "J done" $( echo "$(mytime) - $time0" | bc -l )
 fi
 
 
-if g++ -o compute_h compute_h.cpp -lm
+if g++ -o h_experiment h_experiment.cpp -lm
 then
-    ./compute_h $Tfin $Delta_t $tone $harmonic
+    ./h_experiment $Tfin $Delta_t $tone $harmonic
     echo "h done" $( echo "$(mytime) - $time0" | bc -l )
 fi
 
 
-python3 spherical.py $Tfin $Delta_t $tone $harmonic && echo "spherical done" $( echo "$(mytime) - $time0" | bc -l )
+python3 spherical_FFT.py $Tfin $Delta_t $tone $harmonic && echo "spherical done" $( echo "$(mytime) - $time0" | bc -l )
 
 
-if g++ -o SA_loadInit SA_loadInit.cpp -lm  -std=c++11
+if g++ -o SA_from_spherical SA_from_spherical.cpp -lm -std=c++11
 then
-    for K in 5e-3; #5e-4 1e-3 5e-3 1e-2;
-    do
-        ./SA_loadInit $Tfin $Delta_t $tone $harmonic $annSteps $MCsteps $T0 $Reps &
-        echo Tf $Tfin, dt $Delta_t, tone $tone, harm $harmonic, annSt $annSteps, MCst $MCsteps, T0 $T0, rep $Reps, pid $! >> log.txt
-    done
-    wait 
+    ./SA_from_spherical $Tfin $Delta_t $tone $harmonic $annSteps $MCsteps $T0 $Reps &
+    echo Tf $Tfin, dt $Delta_t, tone $tone, harm $harmonic, annSt $annSteps, MCst $MCsteps, T0 $T0, rep $Reps, pid $! >> log.txt
+    wait
+    
     echo "SA done" $( echo "$(mytime) - $time0" | bc -l )
 fi
-rm compute_J compute_h SA_loadInit
+rm J_experiment h_experiment SA_from_spherical
 
 #python3 scatter.py $Tfin $Delta_t $tone $harmonic &
 

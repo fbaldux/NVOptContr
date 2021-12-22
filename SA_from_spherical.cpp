@@ -6,7 +6,9 @@
         H = 0.5 sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - K sum_i s[i] s[i+1]
 
     - The variables J[i,j] and h[i] are loaded from Init/
-    - The MC moves are only spin flips.
+    - The initial configuration is given by the output of spherical.py, i.e. the spherical
+      model solution.
+    – The only allowed MC moves are domain wall shifts.
     - The energy is computed efficiently at each step.
     - The configurations found are saved to Configurations/, with the # of pulses and 1/eta
       in the header.
@@ -22,10 +24,10 @@
 #include <chrono>
 #include <cmath>
 #include <random>
+#include <vector>
 
 using namespace std;
 typedef std::chrono::high_resolution_clock Clock;
-
 
 // random number generator
 random_device seed; // obtain a random number from hardware
@@ -51,7 +53,7 @@ double Tfin, Delta_t, T0, K0;
 double *Js, *hs;
 
 
-//  --------------------------------------  load h and J  -------------------------------------  //
+//  ------------------------------------  load h, J and s  ------------------------------------  //
 
 void load_J() {
     char filename[100];
@@ -99,6 +101,29 @@ void load_h() {
 }
 
 
+void load_s(int *s) {
+    char filename[100];
+    snprintf(filename, 100, "Configurations/sSpher_T%.4f_dt%.4f_t%d_h%d.txt", Tfin, Delta_t, tone, harmonic);         
+    ifstream infile(filename);
+    
+    if ( ! infile.is_open() ) {
+        cerr << "\nError! No input file.\n\n" << endl;
+        exit(-1);
+    }
+    
+    // skipping the header
+    infile.ignore(1000,'\n');
+    
+    int i=0;
+    double si;
+    while (infile >> si) {
+        s[i++] = si;
+    }
+
+    infile.close();
+}
+
+
 //  -----------------------------------  copy configuration  ----------------------------------  //
 // copies s1 into s2
 void copy_s(int *s1, int *s2) {
@@ -137,7 +162,7 @@ EStruct new_energy(int *s, int flip, EStruct E){
     EStruct E_new = E;
     
     // h term
-    E_new.h -= 2*hs[flip]*s[flip];
+    E_new.h -= 2.*hs[flip]*s[flip];
     
     // J term
     for (int i=0; i<flip; i++)
@@ -149,12 +174,12 @@ EStruct new_energy(int *s, int flip, EStruct E){
     // K term
     if (flip>0) {
         if (flip<N-1)
-            E_new.K -= 2*K0*s[flip]*(s[flip-1]+s[flip+1]);
+            E_new.K -= 2.*K0*s[flip]*(s[flip-1]+s[flip+1]);
         else
-            E_new.K -= 2*K0*s[flip]*s[flip-1];
+            E_new.K -= 2.*K0*s[flip]*s[flip-1];
     }
     else
-        E_new.K -= 2*K0*s[flip]*s[flip+1];
+        E_new.K -= 2.*K0*s[flip]*s[flip+1];
     
     E_new.tot = E_new.J - log(abs(E_new.h)) - E_new.K;
 
@@ -195,32 +220,45 @@ double acceptance_prob(double deltaE, double T) {
 //  ------------------------------------  annealing cycle  ------------------------------------  //
 
 void anneal(int *s, int *best_s, EStruct *E){
-    
     // initial energy
     *E = energy(s);
-    double best_E = E->tot;
+    double best_E = E->tot;    
+    
+    // find the domain walls
+    vector<int> DW;
+    for (int i=0; i<N-1; i++) {
+        if (s[i] == -s[i+1]) {
+            DW.push_back(i);
+        }
+    }
     
     // gradually decrease the temperature
-    for (int n=1; n<ann_steps; n++) {
+    for (int n=0; n<ann_steps; n++) {
         
         double T = temperature(n);
         
-        // equilibrate at fixed temperature
+        // move around the domain walls
         for (int t=0; t<MC_steps; t++) {
+    
+            // pick a domain wall
+            int DW_ind = randomReal(generator)*DW.size();
+            int flip = DW.at(DW_ind);
         
-            // flip a spin in s_new
-            int flip = randomReal(generator)*N;
+            // choose to move it left (0) or right (1)
+            int direction = randomBit(generator);
+            flip += direction;
         
-            // find the new energy efficiently
+            // find the new energy       
             EStruct E_new = new_energy(s, flip, *E);
-        
+    
             // assess the move
             double coin = randomReal(generator);
-            if (coin<acceptance_prob(E_new.tot-E->tot,T)) {
+            if (coin<acceptance_prob(E_new.tot-E->tot,0)) {
                 s[flip] = -s[flip];
                 *E = E_new;
+                DW.at(DW_ind) += 2*direction-1;
             }
-        
+            
             // keep track of the best configuration so far
             if (E->tot < best_E) {
                 best_E = E->tot;
@@ -229,7 +267,7 @@ void anneal(int *s, int *best_s, EStruct *E){
         }
     }
     
-    *E = energy(best_s);
+    *E = energy(best_s);   
 }
 
 
@@ -282,8 +320,8 @@ int main( int argc, char *argv[] ) {
     EStruct E;
     
     // parameter acquisition
-    if( argc != 10 ) {
-        cerr << "\nError! Usage: ./SA <Tfin> <Delta_t> <tone> <harmonic> <ann_steps> <MC_steps> <Temp0> <K> <Reps>\n\n";
+    if( argc != 9 ) {
+        cerr << "\nError! Usage: ./SA_from_spherical <Tfin> <Delta_t> <tone> <harmonic> <ann_steps> <MC_steps> <Temp0> <Reps>\n\n";
         exit(-1);
     }
     Tfin = strtof(argv[1], NULL);
@@ -293,8 +331,8 @@ int main( int argc, char *argv[] ) {
     ann_steps = strtod(argv[5], NULL);
     MC_steps = strtod(argv[6], NULL);
     T0 = strtof(argv[7], NULL);
-    K0 = strtof(argv[8], NULL);
-    Reps = strtod(argv[9], NULL);
+    K0 = 0;
+    Reps = strtod(argv[8], NULL);
     
     // if tritone, set harmonic=0 by default
     if ( tone == 3 )
@@ -320,8 +358,9 @@ int main( int argc, char *argv[] ) {
     
     // load J and h
     load_J();
-    load_h();    
-    
+    load_h();
+        
+ 
     // create the output file
     char filename[100];
     snprintf(filename, 100, "Results/T%.4f_dt%.4f_t%d_h%d_K%.4f.txt", Tfin, Delta_t, tone, harmonic, K0);        
@@ -334,11 +373,9 @@ int main( int argc, char *argv[] ) {
     
     // perform many annealing cycles
     for (int r=0; r<Reps; r++) {
-        // initial random state
-        for (int i=0; i<N; i++) {
-            s[i] = randomBit(generator)*2 - 1;
-        }
-
+        // initial state from spherical model solution
+        load_s(s);
+        
         // anneal the state s to best_s
         anneal(s, best_s, &E);
         
@@ -357,6 +394,7 @@ int main( int argc, char *argv[] ) {
     double elap = double(std::chrono::duration_cast<std::chrono::nanoseconds>(time_fin-time_in).count()) * 1e-9;
     std::cout << "Time per annealing cycle: " << elap/Reps << " s" << std::endl;
     
+    
     // close the files 
     fclose(outfile);
     
@@ -367,5 +405,5 @@ int main( int argc, char *argv[] ) {
     free(s);
     free(best_s);
     
-    return EXIT_SUCCESS;
+    return 0;
 }
