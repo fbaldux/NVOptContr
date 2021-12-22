@@ -140,7 +140,7 @@ np.savetxt(filename, s_Ising, header=head, fmt='%d')
 
 
 
-print(Delta_t, etaInv(energy(s)), etaInv(energy(s_Ising)))
+#print(Delta_t, etaInv(energy(s)), etaInv(energy(s_Ising)))
 
 
 

@@ -33,7 +33,8 @@ for k in range(len(files)):
 plt.xlabel("# of pulses")
 plt.ylabel(r"1/$\eta$")
 
-plt.title(r"$T=%.2f \mu$s, monochromatic signal" % T)
+#plt.title(r"$T=%.2f \mu$s, monochromatic signal" % T)
+plt.title(' '.join(sys.argv[1:]))
 
 plt.legend()
 plt.show()

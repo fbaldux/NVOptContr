@@ -3,7 +3,8 @@
 Simulated annealing schedule for the optimal control problem of NV centers in diamond.
 
 
-
+---
+---
 ## Programs
 
 ---
@@ -79,7 +80,8 @@ The program finds the configuration of _continuous_ spins `s[i]` that minimezes 
 - From the continuous spins are generated _Ising_ spins `s_Ising[i] = sign(s[i])`, that are then saved to Configurations/, with the # of pulses and 1/eta in the header.
 
 
-
+---
+---
 ## Shells
 
 ---

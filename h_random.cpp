@@ -13,6 +13,7 @@
 #include <iomanip>
 #include <fstream>
 #include <cmath>
+#include <random>
 
 using namespace std;
 
@@ -65,14 +66,14 @@ void save_h(double *hs) {
 int main( int argc, char *argv[] ) {
     
     // parameter acquisition
-    if( argc != 4 ) {
-        cerr << "\nError! Usage: ./h_random <Tfin> <Delta_t> <tone>\n\n";
+    if( argc != 5 ) {
+        cerr << "\nError! Usage: ./h_random <Tfin> <Delta_t> <tone> <harmonic>\n\n";
         exit(-1);
     }
     Tfin = strtof(argv[1], NULL);
     Delta_t = strtof(argv[2], NULL);
     tone = strtod(argv[3], NULL);    
-    harmonic = 0;    
+    harmonic = 0;
 
     
     // number of spins
@@ -100,7 +101,7 @@ int main( int argc, char *argv[] ) {
     
     
     // random signal extraction
-    double Atot = 0.
+    double Atot = 0.;
     for (int t=0; t<tone; t++) {
         A[t] = randomReal(generator)*2-1;
         Atot += A[t]*A[t];
@@ -116,7 +117,7 @@ int main( int argc, char *argv[] ) {
     // integration: it can be done analytically for superposition of plane waves
     for (int t=0; t<tone; t++) {
         for (int k=1; k<=N; k++) {
-            hs[k-1] += ( integ_mono(A,omega[t],k*Delta_t,phi[t]) - integ_mono(A,omega[t],(k-1)*Delta_t,phi[t]) ) / Tfin;
+            hs[k-1] += ( integ_mono(A[t],omega[t],k*Delta_t,phi[t]) - integ_mono(A[t],omega[t],(k-1)*Delta_t,phi[t]) ) / Tfin;
         }
     }
     

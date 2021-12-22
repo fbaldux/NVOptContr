@@ -12,7 +12,7 @@ harmonic=5       # number of the harmonic (only for the monochromatic signal)
 annSteps=1e3       # number of steps in the temperature ramp
 MCsteps=1       # number of MC steps at each ramp level
 T0=0.01       # initial temperature
-Reps=10       # number of states to sample
+Reps=1       # number of states to sample
 
 time0=$(mytime)
 
@@ -36,7 +36,7 @@ python3 spherical_FFT.py $Tfin $Delta_t $tone $harmonic && echo "spherical done"
 if g++ -o SA_from_spherical SA_from_spherical.cpp -lm -std=c++11
 then
     ./SA_from_spherical $Tfin $Delta_t $tone $harmonic $annSteps $MCsteps $T0 $Reps &
-    echo Tf $Tfin, dt $Delta_t, tone $tone, harm $harmonic, annSt $annSteps, MCst $MCsteps, T0 $T0, rep $Reps, pid $! >> log.txt
+    #echo Tf $Tfin, dt $Delta_t, tone $tone, harm $harmonic, annSt $annSteps, MCst $MCsteps, T0 $T0, rep $Reps, pid $! >> log.txt
     wait
     
     echo "SA done" $( echo "$(mytime) - $time0" | bc -l )
