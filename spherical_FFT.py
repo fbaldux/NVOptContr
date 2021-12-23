@@ -128,7 +128,7 @@ def domain_walls(s):
     return np.sum( np.abs(np.diff(s)) ) // 2
 
 def etaInv(epsilon):
-    return 1. / np.exp( epsilon - np.log(28025) - 0.5*np.log(N*0.16e-6) )
+    return 1. / np.exp( epsilon - np.log(28025) - 0.5*np.log(N*Delta_t*1e-6) )
 
 
 #  ---------------------------------------  save to file  --------------------------------------  #
@@ -141,6 +141,8 @@ np.savetxt(filename, s_Ising, header=head, fmt='%d')
 
 
 #print(Delta_t, etaInv(energy(s)), etaInv(energy(s_Ising)))
+#print("python:", Delta_t, energy(s_Ising))
+print( "%f %e %e %e %e" % (Delta_t, energy(s), energy(s_Ising), etaInv(energy(s)), etaInv(energy(s_Ising))) )
 
 
 

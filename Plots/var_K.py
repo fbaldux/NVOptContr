@@ -27,7 +27,7 @@ Ks = np.array((0.0004281332398719398,0.0006951927961775608,\
 
 plt.rcParams.update({"text.usetex": True, "font.family": "serif", "font.size": 14})
 #plt.rcParams.update({"text.usetex": True})
-plt.rcParams["figure.figsize"] = [5,5]
+#plt.rcParams["figure.figsize"] = [5,5]
 fig, ax = plt.subplots()
 
 cols = cm.get_cmap("inferno_r", len(Ks)+1)
@@ -57,7 +57,7 @@ for iK in range(len(Ks)):
 
 filename = "Results/T%.4f_dt%.4f_t%d_h%d_K%.4f.txt" % (Tfin,Delta_t,tone,harmonic,0)
 data = np.loadtxt(filename).T
-lab = "exact solution"
+lab = "SA from spherical"
 ax.plot(data[0], data[1], 's', ms=4, label=lab, c='darkgreen')
 
     
@@ -66,5 +66,5 @@ ax.set_ylabel(r"$\eta^{-1}$")
 
 #ax.set_xscale('log')
 
-ax.legend(fontsize=12)
+ax.legend(fontsize=12, ncol=2)
 plt.show()

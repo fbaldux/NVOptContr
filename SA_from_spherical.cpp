@@ -148,11 +148,12 @@ EStruct energy(int *s){
     // also the diagonal term matters
     E.J += 0.5*Js[0]*N;
     
+    /*
     for (int i=1; i<N; i++) {
         E.K += K0*s[i-1]*s[i];
-    }
+    }*/
 
-    E.tot = E.J - log(abs(E.h)) - E.K;
+    E.tot = E.J - log(abs(E.h)); // - E.K;
   
     return E;
 } 
@@ -171,7 +172,7 @@ EStruct new_energy(int *s, int flip, EStruct E){
         E_new.J -= 2.*Js[i-flip]*s[i]*s[flip];
     }
     
-    // K term
+    /* K term
     if (flip>0) {
         if (flip<N-1)
             E_new.K -= 2.*K0*s[flip]*(s[flip-1]+s[flip+1]);
@@ -180,8 +181,8 @@ EStruct new_energy(int *s, int flip, EStruct E){
     }
     else
         E_new.K -= 2.*K0*s[flip]*s[flip+1];
-    
-    E_new.tot = E_new.J - log(abs(E_new.h)) - E_new.K;
+    */
+    E_new.tot = E_new.J - log(abs(E_new.h)); // - E_new.K;
 
     return E_new;
 } 
@@ -222,7 +223,8 @@ double acceptance_prob(double deltaE, double T) {
 void anneal(int *s, int *best_s, EStruct *E){
     // initial energy
     *E = energy(s);
-    double best_E = E->tot;    
+    double best_E = E->tot;
+    copy_s(s, best_s);
     
     // find the domain walls
     vector<int> DW;
@@ -381,7 +383,7 @@ int main( int argc, char *argv[] ) {
         
         // save data
         int dw = domain_walls(best_s);
-        double this_etaInv = etaInv(E.tot+E.K);
+        double this_etaInv = etaInv(E.tot); //etaInv(E.tot+E.K);
         fprintf(outfile, "%d %e\n", dw, this_etaInv);
         // save configuration to file
         save_s(best_s, dw, this_etaInv, r);
