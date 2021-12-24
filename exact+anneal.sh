@@ -7,12 +7,12 @@ Tfin=160.       # final time of the experiments
 Delta_t=0.16       # pi-pulse distance
 
 tone=3       # monochromatic or trichromatic
-harmonic=5       # number of the harmonic (only for the monochromatic signal)
+harmonic=0       # number of the harmonic (only for the monochromatic signal)
 
 annSteps=1e3       # number of steps in the temperature ramp
 MCsteps=1       # number of MC steps at each ramp level
 T0=0.01       # initial temperature
-Reps=1       # number of states to sample
+Reps=100       # number of states to sample
 
 time0=$(mytime)
 

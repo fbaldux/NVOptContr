@@ -394,8 +394,10 @@ int main( int argc, char *argv[] ) {
     // final time
     auto time_fin = Clock::now();
     double elap = double(std::chrono::duration_cast<std::chrono::nanoseconds>(time_fin-time_in).count()) * 1e-9;
-    std::cout << "Time per annealing cycle: " << elap/Reps << " s" << std::endl;
-    
+    //std::cout << "Time per annealing cycle: " << elap/Reps << " s" << std::endl;
+    FILE *ft = fopen("times.txt", "a");
+    fprintf(ft, "%f ", elap/Reps);
+    fclose(ft);
     
     // close the files 
     fclose(outfile);

@@ -37,6 +37,11 @@ for iT in range(len(Tfin)):
     maxEtaInv[iT] = np.max(data[3])
     
 ax.plot(Tfin, maxEtaInv, '.')
+#ax.plot(Tfin[::3], maxEtaInv[::3], '-')
+
+data = np.loadtxt("bound.txt").T
+ax.plot(data[0], data[1],'-')
+#np.savetxt("bound.txt", np.stack((Tfin[::3], maxEtaInv[::3])).T, fmt="%f")
 
 
 #####################  CONVOLVE  #####################

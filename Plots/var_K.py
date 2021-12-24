@@ -25,7 +25,7 @@ Ks = np.array((0.0004281332398719398,0.0006951927961775608,\
                0.01274274985703134,0.03359818286283785))
 
 
-plt.rcParams.update({"text.usetex": True, "font.family": "serif", "font.size": 14})
+plt.rcParams.update({"text.usetex": True, "font.family": "serif", "font.size": 16})
 #plt.rcParams.update({"text.usetex": True})
 #plt.rcParams["figure.figsize"] = [5,5]
 fig, ax = plt.subplots()
@@ -40,6 +40,8 @@ def fman(f):
     return f/10**fexp(f)
     
 
+###################  ONLY ANNEALING  ###################
+
 for iK in range(len(Ks)):
     K = Ks[iK]
     
@@ -52,19 +54,33 @@ for iK in range(len(Ks)):
     av_y = np.average(data[1])
     std_y = np.std(data[1])
     
-    lab = r"$K = %.2f \times 10^{%d}$" % (fman(K), fexp(K))
+    lab = r"$%.2f$$\times$$10^{%d}$" % (fman(K), fexp(K))
     ax.errorbar(av_x, av_y, xerr=std_x, yerr=std_y, marker='o', ms=4, label=lab, c=cols(iK+1))
+
+
+###################  EXACT -> ANNEALING  ###################
 
 filename = "Results/T%.4f_dt%.4f_t%d_h%d_K%.4f.txt" % (Tfin,Delta_t,tone,harmonic,0)
 data = np.loadtxt(filename).T
-lab = "SA from spherical"
-ax.plot(data[0], data[1], 's', ms=4, label=lab, c='darkgreen')
+
+av_x = np.average(data[0])
+std_x = np.std(data[0])
+av_y = np.average(data[1])
+std_y = np.std(data[1])
+
+ax.errorbar(av_x, av_y, xerr=std_x, yerr=std_y, marker='s', ms=4, c='darkgreen')
+
+
+###################  PLOT  ###################
 
     
-ax.set_xlabel("\# of pulses")
-ax.set_ylabel(r"$\eta^{-1}$")
+ax.set_xlabel(r"$\pi$-pulse number")
+ax.set_ylabel(r"$1/\eta$ [Hz$^{1/2}$/$\mu$T]")
+
+ax.text(0.01, 0.94, r"(a)", transform=ax.transAxes)
 
 #ax.set_xscale('log')
 
-ax.legend(fontsize=12, ncol=2)
+ax.legend(fontsize=15, ncol=2, loc='lower right', title=r"$K$")
+plt.savefig("Plots/eta_vs_pulses.pdf", bbox_inches='tight')
 plt.show()
