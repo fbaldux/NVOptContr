@@ -25,8 +25,8 @@ double Tfin, Delta_t;
 //  -------------------------------  functions for the integral  ------------------------------  //
 
 // integrated monochromatic wave
-double integ_mono(double A, double omega0, double t) {
-    return 0.5/M_PI * A * sin(2*omega0*M_PI*t) / omega0;
+double integ_mono(double A, double nu0, double t) {
+    return 0.5/M_PI * A * sin(2*nu0*M_PI*t) / nu0;
 }
 
 
@@ -94,28 +94,28 @@ int main( int argc, char *argv[] ) {
     
     // integration: it can be done analytically for monochromatic or trichromatic signals
     if (tone==1) {
-        double omega0 = 0.4322/(2.*harmonic+1);
+        double nu0 = 0.4322/(2.*harmonic+1);
         
         for (int k=1; k<=N; k++) {
-            hs[k-1] = ( integ_mono(1.,omega0,k*Delta_t) - integ_mono(1.,omega0,(k-1)*Delta_t) ) / Tfin;
+            hs[k-1] = ( integ_mono(1.,nu0,k*Delta_t) - integ_mono(1.,nu0,(k-1)*Delta_t) ) / Tfin;
         }
     }
     else if (tone==3) {        
         double A0 = 0.065*0.2+1./5; 
-        double omega0 = 0.1150;
+        double nu0 = 0.1150;
         double A1 = 0.237*0.2+1./5; 
-        double omega1 = 0.2125; 
+        double nu1 = 0.2125; 
         double A2 = 0.389*0.2+1./5; 
-        double omega2 = 0.1450; 
+        double nu2 = 0.1450; 
         
         double B0 = A0/(A0+A1+A2); 
         double B1 = A1/(A0+A1+A2);
         double B2 = A2/(A0+A1+A2);
                 
-        for (int k=1; k<=N; k++) {
-            hs[k-1]  = ( integ_mono(B0,omega0,k*Delta_t) - integ_mono(B0,omega0,(k-1)*Delta_t) ) / Tfin;
-            hs[k-1] += ( integ_mono(B1,omega1,k*Delta_t) - integ_mono(B1,omega1,(k-1)*Delta_t) ) / Tfin;
-            hs[k-1] += ( integ_mono(B2,omega2,k*Delta_t) - integ_mono(B2,omega2,(k-1)*Delta_t) ) / Tfin;
+        for (int k=0; k<N; k++) {
+            hs[k]  = ( integ_mono(B0,nu0,(k+1)*Delta_t) - integ_mono(B0,nu0,k*Delta_t) ) / Tfin;
+            hs[k] += ( integ_mono(B1,nu1,(k+1)*Delta_t) - integ_mono(B1,nu1,k*Delta_t) ) / Tfin;
+            hs[k] += ( integ_mono(B2,nu2,(k+1)*Delta_t) - integ_mono(B2,nu2,k*Delta_t) ) / Tfin;
         }
     }
     else {

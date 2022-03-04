@@ -247,7 +247,7 @@ int domain_walls(int *s) {
 
 // sensitivity
 double etaInv(double epsilon) {
-    return 1./exp(epsilon - log(gyro)-0.5*log(N*Delta_t*1e-6));
+    return 1./exp(epsilon - log(gyro)-0.5*log(Tfin*1e-6));
 }
 
 
@@ -351,7 +351,7 @@ int main( int argc, char *argv[] ) {
         
         fflush(0);
     }
-    
+    /*
     // final time
     auto time_fin = Clock::now();
     double elap = double(std::chrono::duration_cast<std::chrono::nanoseconds>(time_fin-time_in).count()) * 1e-9;
@@ -359,7 +359,7 @@ int main( int argc, char *argv[] ) {
     FILE *ft = fopen("times.txt", "a");
     fprintf(ft, "%f ", elap/Reps);
     fclose(ft);
-    
+    */
     
     // close the files 
     fclose(outfile);

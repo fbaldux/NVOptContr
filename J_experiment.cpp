@@ -24,7 +24,8 @@ double Tfin, Delta_t, invDt;
 
 // noise power spectrum: peaked contribution
 double S1(double omega) {
-    return 0.52 * exp(-0.5 * (omega-2.7156)*(omega-2.7156) * 1436);
+    //return 0.52 * exp(-0.5 * (omega-2.7156)*(omega-2.7156) * 1436);
+    return 0.52 * exp(-0.5 * (omega-2.7156)*(omega-2.7156) * 100);
 }
 // noise power spectrum: flat contribution
 double S2(double omega) {

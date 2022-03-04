@@ -78,9 +78,9 @@ void load_J() {
 }
 
 
-void load_h() {
+void load_h(int r) {
     char filename[100];
-    snprintf(filename, 100, "Init/h_T%.4f_dt%.4f_t%d_h%d.txt", Tfin, Delta_t, tone, harmonic);        
+    snprintf(filename, 100, "Init/h_T%.4f_dt%.4f_t%d_h%d_r%d.txt", Tfin, Delta_t, tone, harmonic, r);        
     ifstream infile(filename);
     
     if ( ! infile.is_open() ) {
@@ -101,9 +101,9 @@ void load_h() {
 }
 
 
-void load_s(int *s) {
+void load_s(int *s, int rs) {
     char filename[100];
-    snprintf(filename, 100, "Configurations/sSpher_T%.4f_dt%.4f_t%d_h%d.txt", Tfin, Delta_t, tone, harmonic);         
+    snprintf(filename, 100, "Configurations/sSpher_T%.4f_dt%.4f_t%d_h%d_r%d.txt", Tfin, Delta_t, tone, harmonic, rs);         
     ifstream infile(filename);
     
     if ( ! infile.is_open() ) {
@@ -287,7 +287,9 @@ int domain_walls(int *s) {
 
 // sensitivity
 double etaInv(double epsilon) {
-    return 1./exp(epsilon - log(gyro)-0.5*log(N*Delta_t*1e-6));
+    //return 1./exp(epsilon - log(gyro)-0.5*log(Tfin*1e-6));
+    return gyro * sqrt(Tfin) * 1e-3 * exp(-epsilon);
+    
 }
 
 
@@ -318,12 +320,12 @@ void save_s(int *s, int dw, double this_etaInv, int r) {
 //  ------------------------------------------  main  -----------------------------------------  //
 
 int main( int argc, char *argv[] ) {
-    int Reps, *s, *best_s;
+    int *s, *best_s;
     EStruct E;
     
     // parameter acquisition
-    if( argc != 9 ) {
-        cerr << "\nError! Usage: ./SA_from_spherical <Tfin> <Delta_t> <tone> <harmonic> <ann_steps> <MC_steps> <Temp0> <Reps>\n\n";
+    if( argc != 10 ) {
+        cerr << "\nError! Usage: ./SA_from_spherical <Tfin> <Delta_t> <tone> <harmonic> <ann_steps> <MC_steps> <Temp0> <reps_sig> <reps_each>\n\n";
         exit(-1);
     }
     Tfin = strtof(argv[1], NULL);
@@ -334,15 +336,13 @@ int main( int argc, char *argv[] ) {
     MC_steps = strtod(argv[6], NULL);
     T0 = strtof(argv[7], NULL);
     K0 = 0;
-    Reps = strtod(argv[8], NULL);
+    int rep_sig = strtod(argv[8], NULL);
+    int reps_each = strtod(argv[9], NULL);
     
-    // if tritone, set harmonic=0 by default
-    if ( tone == 3 )
+    // if multi-tone, set harmonic=0 by default
+    if ( tone != 1 )
         harmonic = 0;
-    else if ( tone != 1 ) {
-        cerr << "\nError! Unrecognized tone value.\n\n";
-        exit(-1);
-    }
+    
     
     // number of spins
     N = int(Tfin / Delta_t);
@@ -359,50 +359,52 @@ int main( int argc, char *argv[] ) {
     }
     
     // load J and h
-    load_J();
-    load_h();
+    load_J();    
+    load_h(rep_sig);
         
- 
+
     // create the output file
     char filename[100];
-    snprintf(filename, 100, "Results/T%.4f_dt%.4f_t%d_h%d_K%.4f.txt", Tfin, Delta_t, tone, harmonic, K0);        
+    snprintf(filename, 100, "Results/SAspher_T%.4f_dt%.4f_t%d_h%d_K%.4f_r%d.txt", Tfin, Delta_t, tone, harmonic, K0, rep_sig);        
     FILE *outfile = fopen(filename, "w");  
     fprintf(outfile, "# N=%d, MC_steps=%d, T0=%f, K=%f\n# pulses 1/eta\n", N, MC_steps, T0, K0);
-    
-    
+
+
     // time control
-    auto time_in = Clock::now();
-    
+    //auto time_in = Clock::now();
+
     // perform many annealing cycles
-    for (int r=0; r<Reps; r++) {
+    for (int re=0; re<reps_each; re++) {
         // initial state from spherical model solution
-        load_s(s);
-        
+        load_s(s, rep_sig);
+    
         // anneal the state s to best_s
         anneal(s, best_s, &E);
-        
+    
         // save data
         int dw = domain_walls(best_s);
         double this_etaInv = etaInv(E.tot); //etaInv(E.tot+E.K);
         fprintf(outfile, "%d %e\n", dw, this_etaInv);
         // save configuration to file
-        save_s(best_s, dw, this_etaInv, r);
-        
+        //save_s(best_s, dw, this_etaInv, re);
+    
         fflush(0);
     }
-    
+
+    /*
     // final time
     auto time_fin = Clock::now();
     double elap = double(std::chrono::duration_cast<std::chrono::nanoseconds>(time_fin-time_in).count()) * 1e-9;
-    //std::cout << "Time per annealing cycle: " << elap/Reps << " s" << std::endl;
+    //std::cout << "Time per annealing cycle: " << elap/reps_each << " s" << std::endl;
     FILE *ft = fopen("times.txt", "a");
-    fprintf(ft, "%f ", elap/Reps);
+    fprintf(ft, "%f ", elap/reps_each);
     fclose(ft);
-    
+    */
+
     // close the files 
     fclose(outfile);
-    
-    
+        
+        
     // free the memory
     free(Js);
     free(hs);

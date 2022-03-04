@@ -17,22 +17,19 @@ from scipy.linalg import toeplitz
 from scipy.fft import fft,ifft
 from scipy.optimize import brentq
 from matplotlib import pyplot as plt
-from time import time
 
 
 Tfin = float( sys.argv[1] )
 Delta_t = float( sys.argv[2] )
 tone = int( sys.argv[3] )
 harmonic = int( sys.argv[4] )
+rep = int( sys.argv[5] )
 
 N = int( Tfin / Delta_t )
 
 
-if tone == 3:
+if tone > 1:
     harmonic = 0
-elif tone != 1:
-    sys.stderr.write("\nError! Unrecognized tone value.\n\n")
-    exit(-1)
 
 #  ------------------------------------------  import  -----------------------------------------  #
 
@@ -42,15 +39,14 @@ Jmat = toeplitz(J)
 # to have decay both for positive and negative indices
 #J[N//2+1:] = np.flip(J[1:N//2])
 
-h = np.loadtxt("Init/h_T%.4f_dt%.4f_t%d_h%d.txt" % (Tfin,Delta_t,tone,harmonic))
+h = np.loadtxt("Init/h_T%.4f_dt%.4f_t%d_h%d_r%d.txt" % (Tfin,Delta_t,tone,harmonic,rep))
 
 
 #  ------------------------------------  Fourier transform  ------------------------------------  #
 
-start = time()
 
 hF = fft(h, norm='ortho')
-JF = fft(J, norm='ortho')
+JF = fft(J, norm='ortho') #* np.sqrt(N)
 
 
 #  ---------------------------------  functions for S.P. eqs.  ---------------------------------  #
@@ -83,6 +79,8 @@ while np.sign(lhs(b)-rhs(b)) == sign0:
 # solve equation in [a,b]
 lamda = brentq(equation, a, b)
 
+#with open("lambda.txt", "w") as f:
+#    f.write("%f" % lamda)
 
 #  -------------------------------  transform back to real space  ------------------------------  #
 
@@ -98,19 +96,20 @@ s = ifft(sF, norm='ortho').real
 
 s_Ising = np.sign(s).astype(np.int_)
 
-ft = open("times.txt", 'a')
-ft.write("%f " % (time()-start))
-ft.close()
+
+#  -------------------------------------  naive solutions  -------------------------------------  #
+
+s_naive = np.sign(h)
 
 
 #  -------------------------------------------  plot  ------------------------------------------  #
 """
-s_ann = np.loadtxt("Configurations/s_T%.4f_dt%.4f_t%d_h%d_K0.0050_r0.txt" % (Tfin,Delta_t,tone,harmonic))
+#s_ann = np.loadtxt("Configurations/s_T%.4f_dt%.4f_t%d_h%d_K0.0050_r0.txt" % (Tfin,Delta_t,tone,harmonic))
 
-
-plt.plot(np.arange(N), s, '-', c='black', label=r"$s_i \in \mathbb{R}$")
-plt.plot(np.arange(N), s_Ising, '--', c='firebrick', label=r"$s_i = \pm 1$")
-plt.plot(np.arange(N), s_ann, ':', c='darkgreen', label=r"sim. anneal.")
+#plt.plot(np.arange(N), s, '-', c='black', label=r"$s_i \in \mathbb{R}$")
+plt.plot(np.arange(N), s_Ising, '--', c='firebrick', label=r"s_Ising")
+plt.plot(np.arange(N), s_naive, '-', c='blue', label=r"s_naive")
+#plt.plot(np.arange(N), s_ann, ':', c='darkgreen', label=r"sim. anneal.")
 
 plt.xlabel(r"$i$")
 plt.ylabel(r"$s_i$")
@@ -119,7 +118,7 @@ plt.title(r"solution for $N=%d$ spins, $T_f = %.1f$" % (N,N*0.16))
 
 plt.legend()
 plt.show()
-exit(0)
+#exit(0)
 """
 #  ------------------------------------  sensitivity & co.  ------------------------------------  #
 
@@ -131,21 +130,33 @@ def domain_walls(s):
     return np.sum( np.abs(np.diff(s)) ) // 2
 
 def etaInv(epsilon):
-    return 1. / np.exp( epsilon - np.log(28025) - 0.5*np.log(N*Delta_t*1e-6) )
+    #return 1. / np.exp( epsilon - np.log(28025) - 0.5*np.log(Tfin*1e-6) )
+    return 28025 * np.sqrt(Tfin) * 1e-3 * np.exp(-epsilon)
+
 
 
 #  ---------------------------------------  save to file  --------------------------------------  #
 
-filename = "Configurations/sSpher_T%.4f_dt%.4f_t%d_h%d.txt" % (Tfin,Delta_t,tone,harmonic)
+filename = "Results/theor_T%.4f_dt%.4f_t%d_h%d_r%d.txt" % (Tfin,Delta_t,tone,harmonic,rep)
+f = open(filename, 'w')
+f.write("# pulses 1/eta\n")
+f.write("# naive:\n%d %e\n" % (domain_walls(s_naive), etaInv(energy(s_naive))))
+f.write("# bound:\n%d %e\n" % (domain_walls(s), etaInv(energy(s))))
+f.write("# spher:\n%d %e\n" % (domain_walls(s_Ising), etaInv(energy(s_Ising))))
+f.close()
+
+
+filename = "Configurations/sSpher_T%.4f_dt%.4f_t%d_h%d_r%d.txt" % (Tfin,Delta_t,tone,harmonic,rep)
 head = "pulses=%d, 1/eta=%f" % (domain_walls(s_Ising), etaInv(energy(s_Ising)))
 np.savetxt(filename, s_Ising, header=head, fmt='%d')
 
+filename = "Configurations/sNaive_T%.4f_dt%.4f_t%d_h%d_r%d.txt" % (Tfin,Delta_t,tone,harmonic,rep)
+head = "pulses=%d, 1/eta=%f" % (domain_walls(s_naive), etaInv(energy(s_naive)))
+np.savetxt(filename, s_naive, header=head, fmt='%d')
 
 
-
-#print(Delta_t, etaInv(energy(s)), etaInv(energy(s_Ising)))
-#print("python:", Delta_t, energy(s_Ising))
-print( "%f %e %e %e %e" % (Delta_t, energy(s), energy(s_Ising), etaInv(energy(s)), etaInv(energy(s_Ising))) )
+#with open("lambda1.txt", 'a') as f:
+#    f.write("%f %e\n" % (Tfin, etaInv(energy(s))) )
 
 
 

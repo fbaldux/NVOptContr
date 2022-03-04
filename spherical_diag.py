@@ -24,15 +24,14 @@ Tfin = float( sys.argv[1] )
 Delta_t = float( sys.argv[2] )
 tone = int( sys.argv[3] )
 harmonic = int( sys.argv[4] )
+rep = int( sys.argv[5] )
 
 N = int( Tfin / Delta_t )
 
 
-if tone == 3:
+if tone > 1:
     harmonic = 0
-elif tone != 1:
-    sys.stderr.write("\nError! Unrecognized tone value.\n\n")
-    exit(-1)
+
 
 #  ------------------------------------------  import  -----------------------------------------  #
 
@@ -40,7 +39,7 @@ J = np.loadtxt("Init/J_T%.4f_dt%.4f.txt" % (Tfin,Delta_t))
 Jmat = toeplitz(J)
 
 
-h = np.loadtxt("Init/h_T%.4f_dt%.4f_t%d_h%d.txt" % (Tfin,Delta_t,tone,harmonic))
+h = np.loadtxt("Init/h_T%.4f_dt%.4f_t%d_h%d_r%d.txt" % (Tfin,Delta_t,tone,harmonic,rep))
 
 
 #  ------------------------------------  Fourier transform  ------------------------------------  #
@@ -91,6 +90,11 @@ s = np.dot(U,sD).real
 s_Ising = np.sign(s).astype(np.int_)
 
 
+#  -------------------------------------  naive solutions  -------------------------------------  #
+
+s_naive = np.sign(h)
+
+
 #  -------------------------------------------  plot  ------------------------------------------  #
 
 """
@@ -121,17 +125,28 @@ def domain_walls(s):
     return np.sum( np.abs(np.diff(s)) ) // 2
 
 def etaInv(epsilon):
-    return 1. / np.exp( epsilon - np.log(28025) - 0.5*np.log(N*0.16e-6) )
+    #return 1. / np.exp( epsilon - np.log(28025) - 0.5*np.log(Tfin*1e-6) )
+    return 28025 * np.sqrt(Tfin) * 1e-3 * np.exp(-epsilon)
 
 
 #  ---------------------------------------  save to file  --------------------------------------  #
 
-filename = "Configurations/sSpherD_T%.4f_dt%.4f_t%d_h%d.txt" % (Tfin,Delta_t,tone,harmonic)
+filename = "Results/theor_T%.4f_dt%.4f_t%d_h%d_r%d.txt" % (Tfin,Delta_t,tone,harmonic,rep)
+f = open(filename, 'w')
+f.write("# pulses 1/eta\n")
+f.write("# naive:\n%d %e\n" % (domain_walls(s_naive), etaInv(energy(s_naive))))
+f.write("# bound:\n%d %e\n" % (domain_walls(s), etaInv(energy(s))))
+f.write("# spher:\n%d %e\n" % (domain_walls(s_Ising), etaInv(energy(s_Ising))))
+f.close()
+
+
+filename = "Configurations/sSpher_T%.4f_dt%.4f_t%d_h%d_r%d.txt" % (Tfin,Delta_t,tone,harmonic,rep)
 head = "pulses=%d, 1/eta=%f" % (domain_walls(s_Ising), etaInv(energy(s_Ising)))
 np.savetxt(filename, s_Ising, header=head, fmt='%d')
 
-
-
+filename = "Configurations/sNaive_T%.4f_dt%.4f_t%d_h%d_r%d.txt" % (Tfin,Delta_t,tone,harmonic,rep)
+head = "pulses=%d, 1/eta=%f" % (domain_walls(s_naive), etaInv(energy(s_naive)))
+np.savetxt(filename, s_naive, header=head, fmt='%d')
 
 
 

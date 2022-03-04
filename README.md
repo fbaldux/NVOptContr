@@ -1,4 +1,4 @@
-# OptControl-SimAnneal
+# NVOptContr
 
 Simulated annealing schedule for the optimal control problem of NV centers in diamond.
 

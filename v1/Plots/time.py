@@ -22,8 +22,8 @@ data = np.loadtxt("times_good.txt").T
 
 Ns = intv(data[0]/0.16)
 
-ax.plot(Ns, data[1], 'o', ms=4, label="schedule 1.")
-ax.plot(Ns, data[2]+data[3], 's', ms=4, label="schedule 2.")
+ax.plot(Ns, data[1], 'o', ms=4, label="algorithm 1")
+ax.plot(Ns, data[2]+data[3], 's', ms=4, label="algorithm 2")
 
     
 ax.set_xlabel(r"$N = T/\Delta t$")

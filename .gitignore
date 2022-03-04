@@ -5,8 +5,6 @@
 
 # other
 **/.DS_Store
-Configurations/*.txt
-Init/*.txt
-Results/*.txt
+**/*.txt
+**/*.pdf
 log*
-*.txt
