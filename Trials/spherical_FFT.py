@@ -6,7 +6,7 @@
 #
 #   - The variables `J[i,j]` and `h[i]` are loaded from Init/
 #   - From the continuous spins are generated Ising spins s_Ising[i] = sign(s[i]), that are 
-#     then saved to Configurations/, with the # of pulses and 1/eta in the header.
+#     then saved to Configurations/sSpher\_{...}, with the # of pulses and 1/eta in the header.
 #
 #  ---------------------------------------------------------------------------------------------  #
 

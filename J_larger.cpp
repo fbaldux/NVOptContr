@@ -1,7 +1,8 @@
 /*  -------------------------------------------------------------------------------------------  //
 
     The program computes the couplings J for the spin glass Hamiltonian. The couplings 
-    represent the noise to be filtered out.
+    represent the noise to be filtered out.  
+    The noise spectral density is similar to the experiment, but with a larger spread.
     
 //  -------------------------------------------------------------------------------------------  */
 
@@ -24,7 +25,7 @@ double Tfin, Delta_t, invDt;
 
 // noise power spectrum: peaked contribution
 double S1(double omega) {
-    return 0.52 * exp(-0.5 * (omega-2.7156)*(omega-2.7156) * 1436);
+    return 0.52 * exp(-0.5 * (omega-2.7156)*(omega-2.7156) * 100);
 }
 // noise power spectrum: flat contribution
 double S2(double omega) {

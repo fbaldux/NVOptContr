@@ -3,89 +3,7 @@
 Simulated annealing schedule for the optimal control problem of NV centers in diamond.
 
 
----
----
-## Programs
-
----
-### h\_experiment.cpp
-
-The program computes the field h for the spin glass Hamiltonian. The field represents the signal to be detected.  
-Currently, the supported options are monochromatic and trichromatic signal (as in the experiments).
-
-
----
-### h\_random.cpp
-
-The program extracts randomly the field h for the spin glass Hamiltonian, as the superposition of plane waves (`tone` in number) with random amplitudes, frequencies and phases.  
-The field represents the signal to be detected.  
-The variable `harmonic` is dummy.
-
-
----
-### J\_experiment.cpp
-
-The program computes the couplings J for the spin glass Hamiltonian. The couplings represent the noise to be filtered out.
-
-
----
-### SA.cpp
-
-The program anneals a random configuration of Ising spins s[i]=+/-1, according to the cost function
-
-        H = 0.5 sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - K sum_i s[i] s[i+1]
-
-- The variables J[i,j] and h[i] are loaded from Init/
-- The MC moves are only spin flips.
-- The energy is computed efficiently at each step.
-- The configurations found are saved to Configurations/, with the # of pulses and 1/eta in the header.
-- The # of pulses and 1/eta for each configuration are saved to a file in Results/
-
-
----
-### SA\_from\_spherical.cpp
-
-The program anneals a random configuration of Ising spins s[i]=+/-1, according to the cost function
-
-        H = 0.5 sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - K sum_i s[i] s[i+1]
-
-- The variables J[i,j] and h[i] are loaded from Init/
-- The initial configuration is given by the output of spherical.py, i.e. the spherical model solution.
-- The only allowed MC moves are domain wall shifts.
-- The energy is computed efficiently at each step.
-- The configurations found are saved to Configurations/, with the # of pulses and 1/eta in the header.
-- The # of pulses and 1/eta for each configuration are saved to a file in Results/
-
-
----
-### spherical\_FFT.py
-
-The program finds the configuration of _continuous_ spins `s[i]` that minimezes the cost function
-   
-      H = 0.5 sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - lamda ( sum_i s[i]**2 - N )
-
-- The variables `J[i,j]` and `h[i]` are loaded from Init/
-- From the continuous spins are generated _Ising_ spins `s_Ising[i] = sign(s[i])`, that are then saved to Configurations/, with the # of pulses and 1/eta in the header.
-
-
----
-### spherical\_diag.py
-
-The program finds the configuration of _continuous_ spins `s[i]` that minimezes the cost function
-   
-      H = 0.5 sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - lamda ( sum_i s[i]**2 - N )
-
-- The variables `J[i,j]` and `h[i]` are loaded from Init/
-- Exact diagonalization is used instead of the FFT.
-- From the continuous spins are generated _Ising_ spins `s_Ising[i] = sign(s[i])`, that are then saved to Configurations/, with the # of pulses and 1/eta in the header.
-
-
----
----
-## Shells
-
----
-### anneal.sh
+## anneal.sh
 
 This shell runs the codes to
 
@@ -93,17 +11,7 @@ This shell runs the codes to
 - perform many annealing cycles with `SA.cpp`, starting at high temperature from a random state. By default, it uses several values of K (the ferromagnetic coupling) parallelizing to different CPUs.
 
 
----
-### exact.sh
-
-This shell runs the codes to
-
-- compute the vectors `h[i]` and `J[i,j]` (for the experimental setup)
-- compute the exact solution with `spherical_FFT.py`
-
-
----
-### exact+anneal.sh
+## exact+anneal.sh
 
 This shell runs the codes to
 
@@ -112,6 +20,118 @@ This shell runs the codes to
 - perform some annealing cycles with `SA_from_spherical.cpp`, starting at low temperature from the exact solution.
 
 
+## h\_experiment.cpp
+
+The program computes the field h for the spin glass Hamiltonian. The field represents the signal to be detected.  
+Currently, the supported options are monochromatic and trichromatic signal (as in the experiments).
+
+
+## h\_random.cpp
+
+The program computes the field h for the spin glass Hamiltonian. The field represents the signal to be detected.  
+The signal is composed of `tone` random frequencies in [0,1] MHz, random phases and random amplitudes (that sum to 1).
+
+
+## J\_experiment.cpp
+
+The program computes the couplings J for the spin glass Hamiltonian. The couplings represent the noise to be filtered out.
+
+
+## J\_larger.cpp
+
+The program computes the couplings J for the spin glass Hamiltonian. The couplings represent the noise to be filtered out.  
+The noise spectral density is similar to the experiment, but with a larger spread.
+
+
+## histo\_phi.py
+
+The program saves to Analysis/phi{...} the histogram of `phi = eta\_bound / eta`, from the SA optimization of the gCP and spherical model sequences.  
+It also saves to Analysis/finalT\_{...} the averages as a function of the total sensing time.
+
+
+## histo\_phi\_vanilla.py
+
+The program saves to Analysis/phi{...} the histogram of `phi = eta\_bound / eta`, from the SA optimization starting at infinite temperature.  
+It also saves to Analysis/finalT\_{...} the averages as a function of the total sensing time.
+
+
+## multi.sh
+
+This shell runs the codes to
+
+- compute the vectors `h[i]` and `J[i,j]` (for the random setup with larger noise)
+- compute the exact solution with `spherical_diag.py`
+- perform some annealing cycles with `SA_spherical.cpp` and  `SA_GCP.cpp`.
+- perform annealing cycles with `SA.cpp` using various values of K.
+- save the resulting data with the histo\_{...} files.
+
+
+## plot\_{...}
+
+Just to plot the results.
+
+
+## SA.cpp
+
+The program anneals a random configuration of Ising spins s[i]=+/-1, according to the cost function
+
+        H = 0.5 sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - K sum_i s[i] s[i+1]
+
+- The variables J[i,j] and h[i] are loaded from Init/
+- The MC moves are spin flips.
+- The energy is computed efficiently at each step.
+- The configurations found are saved to Configurations/s\_{...}, with the # of pulses and 1/eta in the header.
+- The # of pulses and 1/eta for each configuration are saved to Results/SA\_{...}
+
+
+## SA\_GCP.cpp
+
+
+The program anneals a random configuration of Ising spins s[i]=+/-1, according to the cost function
+
+        H = 0.5 sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]|
+
+- The variables J[i,j] and h[i] are loaded from Init/
+- The initial configuration is given by the zeros of the signal, i.e. the generalized CP sequence (it is generated by the spherical\_{...} file).
+- The only allowed MC moves are domain wall shifts.
+- The energy is computed efficiently at each step.
+- The configurations found are saved to Configurations/sGCPAnn_\{...}, with the # of pulses and 1/eta in the header.
+- The # of pulses and 1/eta for each configuration are saved to Results/SAGCP\_{...}
+
+
+## SA\_spherical.cpp
+
+The program anneals a random configuration of Ising spins s[i]=+/-1, according to the cost function
+
+        H = 0.5 sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]|
+
+- The variables J[i,j] and h[i] are loaded from Init/
+- The initial configuration is given by the output of spherical\_{...}.py, i.e. the spherical model solution.
+- The only allowed MC moves are domain wall shifts.
+- The energy is computed efficiently at each step.
+- The configurations found are saved to Configurations/sSpherAnn\_{...}, with the # of pulses and 1/eta in the header.
+- The # of pulses and 1/eta for each configuration are saved to Results/SAspher\_{...}
+
+
+## spherical\_diag.py
+
+ The program finds the configuration of continuous spins s[i] that minimezes the cost function
+ 
+    H = 0.5 sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - sum_i s[i]**2
+
+- The variables `J[i,j]` and `h[i]` are loaded from Init/
+- Exact diagonalization is used instead of the FFT.
+- From the continuous spins are generated Ising spins `s_Ising[i] = sign(s[i])`, that are then saved to Configurations/sSpher\_{...}, with the # of pulses and 1/eta in the header.
+
+
+## spherical\_FFT.py
+
+The program finds the configuration of _continuous_ spins `s[i]` that minimezes the cost function
+   
+      H = 0.5 sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - lamda ( sum_i s[i]**2 - N )
+
+- The variables `J[i,j]` and `h[i]` are loaded from Init/
+- From the continuous spins are generated Ising spins `s_Ising[i] = sign(s[i])`, that are then saved to Configurations/sSpher\_{...}, with the # of pulses and 1/eta in the header.
 
 
 

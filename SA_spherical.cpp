@@ -3,10 +3,10 @@
     The program anneals a random configuration of Ising spins s[i]=+/-1, according to the 
     cost function
 
-        H = 0.5 sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - K sum_i s[i] s[i+1]
+        H = 0.5 sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]|
 
     - The variables J[i,j] and h[i] are loaded from Init/
-    - The initial configuration is given by the output of spherical.py, i.e. the spherical
+    - The initial configuration is given by the output of spherical\_{...}.py, i.e. the spherical
       model solution.
     – The only allowed MC moves are domain wall shifts.
     - The energy is computed efficiently at each step.
@@ -288,8 +288,7 @@ int domain_walls(int *s) {
 // sensitivity
 double etaInv(double epsilon) {
     //return 1./exp(epsilon - log(gyro)-0.5*log(Tfin*1e-6));
-    return gyro * sqrt(Tfin) * 1e-3 * exp(-epsilon);
-    
+    return gyro * sqrt(Tfin) * 1e-3 * exp(-epsilon);    
 }
 
 
@@ -298,7 +297,7 @@ double etaInv(double epsilon) {
 void save_s(int *s, int dw, double this_etaInv, int r) {
     // create the output file
     char filename[100];
-    snprintf(filename, 100, "Configurations/s_T%.4f_dt%.4f_t%d_h%d_K%.4f_r%d.txt", Tfin, Delta_t, tone, harmonic, K0, r);        
+    snprintf(filename, 100, "Configurations/sSpherAnn_T%.4f_dt%.4f_t%d_h%d_r%d.txt", Tfin, Delta_t, tone, harmonic, r);        
     ofstream outfile(filename);
     
     if ( ! outfile.is_open() ) {
@@ -411,5 +410,5 @@ int main( int argc, char *argv[] ) {
     free(s);
     free(best_s);
     
-    return 0;
+    return EXIT_SUCCESS;
 }
