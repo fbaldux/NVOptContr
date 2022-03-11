@@ -4,12 +4,20 @@ Delta_t=0.1       # pi-pulse distance
 tone=7       # monochromatic or trichromatic
 harmonic=0       # number of the harmonic (only for the monochromatic signal)
 
+reps_sig=1000       # sample size for signals
+
+# guided SA
 annSteps=1e3       # number of steps in the temperature ramp
 MCsteps=1       # number of MC steps at each ramp level
 T0=0.01       # initial temperature
-reps_sig=2       # sample size for signals
-reps_each=2       # number of states to sample
-reps_each_vanilla=20       # number of states to sample (vanilla case)
+reps_each=10       # number of states to sample
+
+# "vanilla" SA
+annSteps_VSA=1e3       # number of steps in the temperature ramp
+MCsteps_VSA=1e2       # number of MC steps at each ramp level
+T0_VSA=0.1       # initial temperature
+reps_each_VSA=100       # number of states to sample
+
 
 Ks=(0.0001 0.0002 0.0003 0.0005 0.0008 0.0013 0.0022 0.0036 0.0060 0.0100)
 
@@ -25,7 +33,7 @@ g++ -o SA_GCP SA_GCP.cpp -lm -std=c++11
 g++ -o SA SA.cpp -lm -std=c++11
 
 
-for Tfin in $(seq 10 10 10)
+for Tfin in $(seq 10 10 120)
 do
     (
     # compute J
@@ -48,7 +56,7 @@ do
             # annealing from infinite temperature
             for K in ${Ks[@]}
             do
-                ./SA $Tfin $Delta_t $tone $harmonic $annSteps $MCsteps $T0 $K $r $reps_each_vanilla 1>>log 2>>err   
+                ./SA $Tfin $Delta_t $tone $harmonic $annSteps_VSA $MCsteps_VSA $T0_VSA $K $r $reps_each_VSA 1>>log 2>>err   
             done
         fi
     done

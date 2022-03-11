@@ -60,7 +60,7 @@ void load_J() {
     ifstream infile(filename);
         
     if ( ! infile.is_open() ) {
-        cerr << "\nError! No input file.\n\n" << endl;
+        cerr << "\nError! No input file \"" << filename << "\"\n\n\n";
         exit(-1);
     }
     
@@ -83,7 +83,7 @@ void load_h(int r) {
     ifstream infile(filename);
     
     if ( ! infile.is_open() ) {
-        cerr << "\nError! No input file.\n\n" << endl;
+        cerr << "\nError! No input file \"" << filename << "\"\n\n\n";
         exit(-1);
     }
     
