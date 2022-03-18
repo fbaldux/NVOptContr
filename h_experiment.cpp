@@ -22,13 +22,19 @@ int N, tone, harmonic;
 double Tfin, Delta_t;
 
 
+//  ------------------------------  solving issues with rounding  -----------------------------  //
+
+double round(double d) {
+    return floor(d+0.5);
+}
+
+
 //  -------------------------------  functions for the integral  ------------------------------  //
 
 // integrated monochromatic wave
 double integ_mono(double A, double nu0, double t) {
     return 0.5/M_PI * A * sin(2*nu0*M_PI*t) / nu0;
 }
-
 
 
 //  ------------------------------------  save output data  -----------------------------------  //
@@ -72,7 +78,7 @@ int main( int argc, char *argv[] ) {
         harmonic = 0;
     
     // number of spins
-    N = int(Tfin / Delta_t);
+    N = round(Tfin / Delta_t);
     
     
     // check if file already exists

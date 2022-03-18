@@ -31,6 +31,13 @@ int N, tone, rep;
 double Tfin, Delta_t;
 
 
+//  ------------------------------  solving issues with rounding  -----------------------------  //
+
+double round(double d) {
+    return floor(d+0.5);
+}
+
+
 //  -------------------------------  functions for the integral  ------------------------------  //
 
 // integrated monochromatic wave
@@ -92,7 +99,7 @@ int main( int argc, char *argv[] ) {
     
     
     // number of spins
-    N = int(Tfin / Delta_t);
+    N = round(Tfin / Delta_t);
     
     
     // dynamic allocation

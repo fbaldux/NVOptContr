@@ -20,6 +20,13 @@ int N;
 double Tfin, Delta_t, invDt;
 
 
+//  ------------------------------  solving issues with rounding  -----------------------------  //
+
+double round(double d) {
+    return floor(d+0.5);
+}
+
+
 //  -------------------------------  functions to be integrated  ------------------------------  //
 
 // noise power spectrum: peaked contribution
@@ -99,7 +106,7 @@ int main( int argc, char *argv[] ) {
     invDt = 1./Delta_t;
     
     // number of spins
-    N = int(Tfin / Delta_t);
+    N = round(Tfin / Delta_t);
     
     
     // check if file already exists

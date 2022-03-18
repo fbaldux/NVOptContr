@@ -1,6 +1,6 @@
 
-Tfin=80.       # final time of the experiments
-Delta_t=0.16       # pi-pulse distance
+Tfin=10.       # final time of the experiments
+Delta_t=0.1       # pi-pulse distance
 
 tone=7       # monochromatic or trichromatic
 harmonic=0       # number of the harmonic (only for the monochromatic signal)
@@ -43,7 +43,7 @@ echo "spherical done" $(mytime_elap)
 echo "SA done" $(mytime_elap)
 
 
-#rm J h SA
+rm J h SA
 
 
 
