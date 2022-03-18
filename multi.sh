@@ -35,7 +35,7 @@ g++ -o SA SA.cpp -lm -std=c++11
 
 for Tfin in $(seq 10 10 120)
 do
-    (
+    #(
     # compute J
     ./J $Tfin $Delta_t 1>>log 2>>err
 
@@ -56,8 +56,9 @@ do
             # annealing from infinite temperature
             for K in ${Ks[@]}
             do
-                ./SA $Tfin $Delta_t $tone $harmonic $annSteps_VSA $MCsteps_VSA $T0_VSA $K $r $reps_each_VSA 1>>log 2>>err   
+                ./SA $Tfin $Delta_t $tone $harmonic $annSteps_VSA $MCsteps_VSA $T0_VSA $K $r $reps_each_VSA 1>>log 2>>err &
             done
+            wait
         fi
     done
 
@@ -66,10 +67,11 @@ do
     
     for K in ${Ks[@]}
     do
-        python histo_phi_vanilla.py $Tfin $Delta_t $tone $K $reps_sig 1>>log 2>>err
+        python histo_phi_vanilla.py $Tfin $Delta_t $tone $K $reps_sig 1>>log 2>>err &
     done
+    wait
     
-    )&
+    #)&
 done
 
 wait

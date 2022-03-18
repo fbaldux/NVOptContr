@@ -364,7 +364,7 @@ int main( int argc, char *argv[] ) {
 
     // create the output file
     char filename[100];
-    snprintf(filename, 100, "Results/SAGCP_T%.4f_dt%.4f_t%d_h%d_K%.4f_r%d.txt", Tfin, Delta_t, tone, harmonic, K0, rep_sig);        
+    snprintf(filename, 100, "Results/SAGCP_T%.4f_dt%.4f_t%d_h%d_r%d.txt", Tfin, Delta_t, tone, harmonic, rep_sig);        
     FILE *outfile = fopen(filename, "w");  
     fprintf(outfile, "# N=%d, MC_steps=%d, T0=%f, K=%f\n# pulses 1/eta\n", N, MC_steps, T0, K0);
 

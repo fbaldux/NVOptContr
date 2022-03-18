@@ -48,7 +48,7 @@ struct EStruct {
 #define gyro 28025      // to compute eta
 
 // global variables
-int N, tone, harmonic, ann_steps, MC_steps, MC_ramp_step; 
+int N, tone, harmonic, ann_steps, MC_steps, MC_ramp_step, rep_sig; 
 double Tfin, Delta_t, T0, K0;
 double *Js, *hs;
 
@@ -294,10 +294,10 @@ double etaInv(double epsilon) {
 
 //  ------------------------------------  save output data  -----------------------------------  //
 
-void save_s(int *s, int dw, double this_etaInv, int r) {
+void save_s(int *s, int dw, double this_etaInv, int re) {
     // create the output file
     char filename[100];
-    snprintf(filename, 100, "Configurations/sSpherAnn_T%.4f_dt%.4f_t%d_h%d_r%d.txt", Tfin, Delta_t, tone, harmonic, r);        
+    snprintf(filename, 100, "Configurations/sSpherAnn_T%.4f_dt%.4f_t%d_h%d_rs%d_re%d.txt", Tfin, Delta_t, tone, harmonic, rep_sig, re);        
     ofstream outfile(filename);
     
     if ( ! outfile.is_open() ) {
@@ -335,7 +335,7 @@ int main( int argc, char *argv[] ) {
     MC_steps = strtod(argv[6], NULL);
     T0 = strtof(argv[7], NULL);
     K0 = 0;
-    int rep_sig = strtod(argv[8], NULL);
+    rep_sig = strtod(argv[8], NULL);
     int reps_each = strtod(argv[9], NULL);
     
     // if multi-tone, set harmonic=0 by default
@@ -364,7 +364,7 @@ int main( int argc, char *argv[] ) {
 
     // create the output file
     char filename[100];
-    snprintf(filename, 100, "Results/SAspher_T%.4f_dt%.4f_t%d_h%d_K%.4f_r%d.txt", Tfin, Delta_t, tone, harmonic, K0, rep_sig);        
+    snprintf(filename, 100, "Results/SAspher_T%.4f_dt%.4f_t%d_h%d_r%d.txt", Tfin, Delta_t, tone, harmonic, rep_sig);        
     FILE *outfile = fopen(filename, "w");  
     fprintf(outfile, "# N=%d, MC_steps=%d, T0=%f, K=%f\n# pulses 1/eta\n", N, MC_steps, T0, K0);
 

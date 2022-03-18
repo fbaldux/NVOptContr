@@ -11,20 +11,23 @@ reps_sig = int( sys.argv[3] )
 plt.rcParams.update({"text.usetex": True, "font.family": "serif", "font.size": 16})
 
 dots = ('o', 'v', '^', '>', '<', 's', 'P', 'h', 'X', 'D')
-cols = cm.get_cmap('Set1', 10)
+cols = cm.get_cmap('magma', 12)
 
 labs = ["gCPMG", "spherical", r"gCPMG $\to$ SA", r"spherical $\to$ SA"]
 
 fig, ax = plt.subplots()
 
+Ks = np.array((0.0001,0.0002,0.0003,0.0005,0.0008,0.0013,0.0022,0.0036,0.0060,0.0100))
 
-filename = "Analysis/finalT_dt%.4f_t%d_av%d.txt" % (Delta_t,tone,reps_sig)
-data = np.loadtxt(filename).T
+for iK in range(len(Ks)): 
+    K = Ks[iK]
+    
+    filename = "Analysis/finalT_dt%.4f_t%d_K%.4f_av%d.txt" % (Delta_t,tone,K,reps_sig)
+    data = np.loadtxt(filename).T
 
 
-for x in range(4):
-    ax.plot(data[0], data[1+3*x], '-', marker=dots[x], c=cols(x), ms=4, label=labs[x])
-    ax.fill_between(data[0], data[2+3*x], data[3+3*x], color=cols(x), alpha=0.2)
+    ax.plot(data[0], data[1], '-', c=cols(iK), ms=4, label=K)
+    #ax.fill_between(data[0], data[2], data[3], color=cols(iK), alpha=0.2)
 
 """ax.plot(data[0], data[3], '-', marker=dots[1], c=cols(1), ms=4, label=labs[1])
 ax.plot(data[0], data[5], '-', marker=dots[2], c=cols(2), ms=4, label=labs[2])

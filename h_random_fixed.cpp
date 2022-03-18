@@ -103,23 +103,15 @@ int main( int argc, char *argv[] ) {
     }
     
 
-    double *A = new double[tone]();   
-    double *omega = new double[tone]();   
-    double *phi = new double[tone]();  
+    double A[7] = {0.142241, 0.102567, 0.164911, 0.174642, 0.214671, 0.06411 , 0.136858};   
+    double omega[7] = {0.935326, 0.184713, 0.691916, 0.409031, 0.216931, 0.582142, 0.079503};   
+    double phi[7] = {5.90295 , 1.77293 , 1.948228, 0.77013 , 4.60635 , 0.942352, 0.520557};  
      
-    // random signal extraction
-    double Atot = 0.;
-    for (int t=0; t<tone; t++) {
-        A[t] = randomReal(generator);
-        Atot += A[t];
-        omega[t] = randomReal(generator) * 2*M_PI;
-        phi[t] = randomReal(generator) * 2*M_PI;
-    }
-    // normalize to 1
-    for (int t=0; t<tone; t++) {
-        A[t] /= Atot;
-    }
 
+    for (int i=0; i<7; i++) {
+        omega[i] *= 2*M_PI;
+    }
+    
 #ifdef SAVE_SIGNAL
     save_signal(A,omega,phi);
 #endif
@@ -131,7 +123,6 @@ int main( int argc, char *argv[] ) {
             hs[k] += ( integ_mono(A[t],omega[t],(k+1)*Delta_t,phi[t]) - integ_mono(A[t],omega[t],k*Delta_t,phi[t]) ) / Tfin;
         }
     }
-    
     
     // save J to file
     save_h(hs);

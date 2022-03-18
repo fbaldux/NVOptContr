@@ -92,7 +92,17 @@ s_Ising = np.sign(s).astype(np.int_)
 
 #  -------------------------------------  naive solutions  -------------------------------------  #
 
-s_naive = np.sign(h)
+# this is not quite correct
+#s_naive = np.sign(h)
+
+# here it really changes sign with the signal
+hData = np.loadtxt("Init/hData_T%.4f_dt%.4f_t%d_h%d_r%d.txt" % (Tfin,Delta_t,tone,harmonic,rep)).T
+
+ht = np.zeros(N)
+for i in range(N):
+    ht[i] = np.sum( hData[0] * np.cos(2*np.pi*hData[1]*(i+0.5)*Delta_t + hData[2]) )
+
+s_naive = np.sign(ht)
 
 
 #  -------------------------------------------  plot  ------------------------------------------  #
@@ -118,7 +128,7 @@ exit(0)
 #  ------------------------------------  sensitivity & co.  ------------------------------------  #
 
 def energy(s):
-    return np.einsum("a,ab,b", s, Jmat, s) - np.log( np.abs( np.dot(h,s) ) )
+    return 0.5*np.einsum("a,ab,b", s, Jmat, s) - np.log( np.abs( np.dot(h,s) ) )
 
 def domain_walls(s):
     #return (N - np.dot(s[:-1],s[1:]) - 1) // 2
@@ -144,7 +154,7 @@ filename = "Configurations/sSpher_T%.4f_dt%.4f_t%d_h%d_r%d.txt" % (Tfin,Delta_t,
 head = "pulses=%d, 1/eta=%f" % (domain_walls(s_Ising), etaInv(energy(s_Ising)))
 np.savetxt(filename, s_Ising, header=head, fmt='%d')
 
-filename = "Configurations/sNaive_T%.4f_dt%.4f_t%d_h%d_r%d.txt" % (Tfin,Delta_t,tone,harmonic,rep)
+filename = "Configurations/sGCP_T%.4f_dt%.4f_t%d_h%d_r%d.txt" % (Tfin,Delta_t,tone,harmonic,rep)
 head = "pulses=%d, 1/eta=%f" % (domain_walls(s_naive), etaInv(energy(s_naive)))
 np.savetxt(filename, s_naive, header=head, fmt='%d')
 
