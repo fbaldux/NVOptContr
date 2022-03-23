@@ -385,7 +385,7 @@ int main( int argc, char *argv[] ) {
         double this_etaInv = etaInv(E.tot); //etaInv(E.tot+E.K);
         fprintf(outfile, "%d %e\n", dw, this_etaInv);
         // save configuration to file
-        //save_s(best_s, dw, this_etaInv, re);
+        save_s(best_s, dw, this_etaInv, re);
     
         fflush(0);
     }

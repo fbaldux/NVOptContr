@@ -1,6 +1,6 @@
 
-Tfin=10.       # final time of the experiments
-Delta_t=0.1       # pi-pulse distance
+Tfin=160.       # final time of the experiments
+Delta_t=0.16       # pi-pulse distance
 
 tone=7       # monochromatic or trichromatic
 harmonic=0       # number of the harmonic (only for the monochromatic signal)
@@ -8,7 +8,7 @@ harmonic=0       # number of the harmonic (only for the monochromatic signal)
 annSteps=1e3       # number of steps in the temperature ramp
 MCsteps=1       # number of MC steps at each ramp level
 T0=0.01       # initial temperature
-reps_each=3       # number of states to sample
+reps_each=1       # number of states to sample
 
 
 function mytime() {
@@ -17,10 +17,11 @@ function mytime() {
 }
 
 
-rm Init/* Results/* Configurations/*
+#rm Init/* Results/* Configurations/*
 
 g++ -o J J_experiment.cpp -lm
-g++ -o h h_random.cpp -lm
+#g++ -o h h_random.cpp -lm
+g++ -o h h_random_load.cpp -lm
 g++ -o SA SA_spherical.cpp -lm -std=c++11
 
 
@@ -30,18 +31,21 @@ function mytime_elap() {
 }
 
 ./J $Tfin $Delta_t
-echo "J done" $(mytime_elap)
+#echo "J done" $(mytime_elap)
 
-#./h $Tfin $Delta_t $tone $harmonic
-./h $Tfin $Delta_t $tone 0
-echo "h done" $(mytime_elap)
+for r in {22..22}
+do
 
-python3 spherical_diag.py $Tfin $Delta_t $tone $harmonic 0
-echo "spherical done" $(mytime_elap)
+    #./h $Tfin $Delta_t $tone $harmonic
+    ./h $Tfin $Delta_t $tone $r
+    #echo "h done" $(mytime_elap)
 
-./SA $Tfin $Delta_t $tone $harmonic $annSteps $MCsteps $T0 0 $reps_each
-echo "SA done" $(mytime_elap)
+    python3 spherical_diag.py $Tfin $Delta_t $tone $harmonic $r
+    #echo "spherical done" $(mytime_elap)
 
+    ./SA $Tfin $Delta_t $tone $harmonic $annSteps $MCsteps $T0 $r $reps_each
+    #echo "SA done" $(mytime_elap)
+done
 
 rm J h SA
 

@@ -21,8 +21,8 @@ reps_each_VSA=100       # number of states to sample
 
 Ks=(0.0001 0.0002 0.0003 0.0005 0.0008 0.0013 0.0022 0.0036 0.0060 0.0100)
 
-threads=1
-thread_size=$(( $reps_sig / $threads ))
+#threads=1
+#thread_size=$(( $reps_sig / $threads ))
 
 #rm Init/* Results/* Configurations/*
 

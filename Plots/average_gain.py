@@ -10,7 +10,7 @@ reps_sig = 1000
 
 plt.rcParams.update({"text.usetex": True, "font.family": "serif", "font.size": 14})
 
-dots = ('D','o','s','v','^','P','h','X','>','<')
+dots = ('D','^','v','s','o','P','h','X','>','<')
 cols = cm.get_cmap('tab10', 10)
 alpha = 0.1
 
@@ -31,7 +31,6 @@ for x in range(4):
     ax.fill_between(data[0], data[2+3*x], data[3+3*x], color=cols(x), alpha=alpha)
 
 
-
 #  ----------------------------------------  vanilla SA  ---------------------------------------  #
 
 Ks = np.array((0.0001,0.0002,0.0003,0.0005,0.0008,0.0013,0.0022,0.0036,0.0060,0.0100))
@@ -50,15 +49,15 @@ for iK in range(len(Ks)):
     best_SA_low = np.maximum(best_SA_low, data[2])
     best_SA_high = np.maximum(best_SA_high, data[3])
     
+    
 ax.plot(data[0], best_SA, '-', marker=dots[x+1], c=cols(x+1), ms=4, label=r"SA")
 ax.fill_between(data[0], best_SA_low, best_SA_high, color=cols(x+1), alpha=alpha)
-
 
 
 #  --------------------------------------  plot style etc  -------------------------------------  #
 
 ax.set_xlabel(r"$T$ [$\mu$s]")
-ax.set_ylabel(r"$\phi = \eta_{\mathrm{SM}}/\eta$")
+ax.set_ylabel(r"$\eta_{\mathrm{SM}}/\eta$")
 
 #ax.set_xscale('log')
 

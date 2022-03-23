@@ -38,6 +38,37 @@ double round(double d) {
 }
 
 
+//  -----------------------------------  load signal specs  -----------------------------------  //
+
+void load_specs(double *A, double *omega, double *phi) {
+    char filename[100];
+    snprintf(filename, 100, "Init/hData_T%.4f_dt%.4f_t%d_h%d_r%d.txt", 80., Delta_t, tone, 0, rep); 
+    ifstream infile(filename);
+	
+    if ( ! infile.is_open() ) {
+        cerr << "\nError! No input file \"" << filename << "\"\n\n\n";
+        exit(-1);
+    }
+    
+    // skipping the header
+    infile.ignore(1000,'\n');
+
+	// read each row
+	for(int t=0; t<tone; t++) {
+        // read each column
+		infile >> A[t]; 
+        infile >> omega[t];
+        infile >> phi[t];        
+	}
+	infile.close();
+
+    
+    for (int t=0; t<tone; t++) {
+        omega[t] *= 2*M_PI;
+    }
+}
+
+
 //  -------------------------------  functions for the integral  ------------------------------  //
 
 // integrated monochromatic wave
@@ -110,15 +141,13 @@ int main( int argc, char *argv[] ) {
     }
     
 
-    double A[7] = {0.142241, 0.102567, 0.164911, 0.174642, 0.214671, 0.06411 , 0.136858};   
-    double omega[7] = {0.935326, 0.184713, 0.691916, 0.409031, 0.216931, 0.582142, 0.079503};   
-    double phi[7] = {5.90295 , 1.77293 , 1.948228, 0.77013 , 4.60635 , 0.942352, 0.520557};  
-     
+    double *A = new double[tone]();   
+    double *omega = new double[tone]();   
+    double *phi = new double[tone]();  
 
-    for (int i=0; i<7; i++) {
-        omega[i] *= 2*M_PI;
-    }
+    load_specs(A,omega,phi);
     
+        
 #ifdef SAVE_SIGNAL
     save_signal(A,omega,phi);
 #endif

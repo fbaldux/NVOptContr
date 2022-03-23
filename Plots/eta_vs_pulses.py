@@ -7,7 +7,7 @@ Tfin = 100
 Delta_t = 0.1
 tone = 7
 harmonic = 0
-
+rep = 2
 
 Ks = np.array((0.0001,0.0002,0.0003,0.0005,0.0008,0.0013,0.0022,0.0036,0.0060,0.0100))
 
@@ -16,7 +16,7 @@ plt.rcParams.update({"text.usetex": True, "font.family": "serif", "font.size": 1
 #plt.rcParams["figure.figsize"] = [5,5]
 fig, ax = plt.subplots()
 
-cols = cm.get_cmap("inferno_r", len(Ks)+1)
+cols = cm.get_cmap("viridis_r", len(Ks)+1)
 
 
 def fexp(f):
@@ -30,7 +30,7 @@ def fman(f):
 for iK in range(1,len(Ks)):
     K = Ks[iK]
     
-    filename = "Results4Plots/SA_T%.4f_dt%.4f_t%d_h%d_K%.4f_r%d.txt" % (Tfin,Delta_t,tone,harmonic,K,0)
+    filename = "Results4Plots/SA_T%.4f_dt%.4f_t%d_h%d_K%.4f_r%d.txt" % (Tfin,Delta_t,tone,harmonic,K,rep)
     data = np.loadtxt(filename).T
     #ax.plot(data[0], data[1], 'o', ms=2, label="K=%.1e"%K, c=cols(iK))
     
@@ -48,7 +48,7 @@ for iK in range(1,len(Ks)):
 
 #  -----------------------------------  spherical model + SA  ----------------------------------  #
 
-filename = "Results4Plots/SAspher_T%.4f_dt%.4f_t%d_h%d_K%.4f_r%d.txt" % (Tfin,Delta_t,tone,harmonic,0,0)
+filename = "Results4Plots/SAspher_T%.4f_dt%.4f_t%d_h%d_r%d.txt" % (Tfin,Delta_t,tone,harmonic,rep)
 data = np.loadtxt(filename).T
 
 av_x = np.average(data[0])
@@ -56,7 +56,7 @@ std_x = np.std(data[0])
 av_y = np.average(data[1])
 std_y = np.std(data[1])
 
-ax.errorbar(av_x, av_y, xerr=std_x, yerr=std_y, marker='s', ms=4, label=r"sign(SM)+SA", c='tab:green')
+ax.errorbar(av_x, av_y, xerr=std_x, yerr=std_y, marker='s', ms=4, label=r"sign(SM)+SA", c='tab:red')
 
 """
 #  -------------------------------------  spherical model  -------------------------------------  #

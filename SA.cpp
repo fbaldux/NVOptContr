@@ -53,7 +53,6 @@ double *Js, *hs;
 
 //  --------------------------------------  load h and J  -------------------------------------  //
 
-
 void load_J() {
     char filename[100];
     snprintf(filename, 100, "Init/J_T%.4f_dt%.4f.txt", Tfin, Delta_t);            
@@ -98,8 +97,6 @@ void load_h(int r) {
 
     infile.close();
 }
-
-
 
 
 //  -----------------------------------  copy configuration  ----------------------------------  //

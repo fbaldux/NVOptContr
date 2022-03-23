@@ -35,11 +35,11 @@ for r in range(reps_sig):
 
         # ---------- annealed part ---------- #
     
-        filename = "Results/SAGCP_T%.4f_dt%.4f_t%d_h%d_K%.4f_r%d.txt" % (Tfin,Delta_t,tone,harmonic,0,r)
+        filename = "Results/SAGCP_T%.4f_dt%.4f_t%d_h%d_r%d.txt" % (Tfin,Delta_t,tone,harmonic,r)
         data2 = np.loadtxt(filename).T
         pot[2,r] = np.average(data2[1]) / data[1]
 
-        filename = "Results/SAspher_T%.4f_dt%.4f_t%d_h%d_K%.4f_r%d.txt" % (Tfin,Delta_t,tone,harmonic,0,r)
+        filename = "Results/SAspher_T%.4f_dt%.4f_t%d_h%d_r%d.txt" % (Tfin,Delta_t,tone,harmonic,r)
         data2 = np.loadtxt(filename).T
         pot[3,r] = np.average(data2[1]) / data[1]
 
@@ -78,9 +78,9 @@ for x in range(4):
     
 with open("Analysis/finalT_dt%.4f_t%d_av%d.txt" % (Delta_t,tone,reps_sig), 'a') as f:
     f.write("%f " % Tfin)
-    f.write("%f %f %f "  % (avs[0],lows[0],highs[0]))
-    f.write("%f %f %f "  % (avs[1],lows[1],highs[1]))
-    f.write("%f %f %f "  % (avs[2],lows[2],highs[2]))
-    f.write("%f %f %f\n" % (avs[3],lows[3],highs[3]))
+    f.write("%f %f %f "  % (avs[0],lows[0],highs[0])) # gCP 
+    f.write("%f %f %f "  % (avs[1],lows[1],highs[1])) # spher 
+    f.write("%f %f %f "  % (avs[2],lows[2],highs[2])) # ann_gCP
+    f.write("%f %f %f\n" % (avs[3],lows[3],highs[3])) # ann_spher
    
 
