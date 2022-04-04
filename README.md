@@ -32,15 +32,10 @@ The program computes the field h for the spin glass Hamiltonian. The field repre
 The signal is composed of `tone` random frequencies in [0,1] MHz, random phases and random amplitudes (that sum to 1).
 
 
-## J\_experiment.cpp
+## h\_random\_load.cpp
 
-The program computes the couplings J for the spin glass Hamiltonian. The couplings represent the noise to be filtered out.
-
-
-## J\_larger.cpp
-
-The program computes the couplings J for the spin glass Hamiltonian. The couplings represent the noise to be filtered out.  
-The noise spectral density is similar to the experiment, but with a larger spread.
+The program computes the field h for the spin glass Hamiltonian. The field represents the signal to be detected.  
+The signal is composed of `tone` random frequencies in [0,1] MHz, random phases and random amplitudes (that sum to 1). Such numbers are loaded from Init/hData\_{...}
 
 
 ## histo\_phi.py
@@ -53,6 +48,17 @@ It also saves to Analysis/finalT\_{...} the averages as a function of the total 
 
 The program saves to Analysis/phi{...} the histogram of `phi = eta\_bound / eta`, from the SA optimization starting at infinite temperature.  
 It also saves to Analysis/finalT\_{...} the averages as a function of the total sensing time.
+
+
+## J\_experiment.cpp
+
+The program computes the couplings J for the spin glass Hamiltonian. The couplings represent the noise to be filtered out.
+
+
+## J\_larger.cpp
+
+The program computes the couplings J for the spin glass Hamiltonian. The couplings represent the noise to be filtered out.  
+The noise spectral density is similar to the experiment, but with a larger spread.
 
 
 ## multi.sh
@@ -117,23 +123,23 @@ The program anneals a random configuration of Ising spins s[i]=+/-1, according t
 
  The program finds the configuration of continuous spins s[i] that minimezes the cost function
  
-    H = 0.5 sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - sum_i s[i]**2
+    H = 0.5 sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - lamda ( sum_i s[i]**2 - N )
 
 - The variables `J[i,j]` and `h[i]` are loaded from Init/
 - Exact diagonalization is used instead of the FFT.
 - From the continuous spins are generated Ising spins `s_Ising[i] = sign(s[i])`, that are then saved to Configurations/sSpher\_{...}, with the # of pulses and 1/eta in the header.
 
 
-## spherical\_FFT.py
+## spherical\_moreLambdas.py
 
-The program finds the configuration of _continuous_ spins `s[i]` that minimezes the cost function
-   
-      H = 0.5 sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - lamda ( sum_i s[i]**2 - N )
+ The program finds the configuration of continuous spins s[i] that minimezes the cost function
+ 
+    H = 0.5 sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - sum_i s[i]**2
 
 - The variables `J[i,j]` and `h[i]` are loaded from Init/
+- Exact diagonalization is used instead of the FFT.
+- lambda can assume at most k different values.
 - From the continuous spins are generated Ising spins `s_Ising[i] = sign(s[i])`, that are then saved to Configurations/sSpher\_{...}, with the # of pulses and 1/eta in the header.
-
-
 
 
 

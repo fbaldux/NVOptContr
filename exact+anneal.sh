@@ -1,5 +1,5 @@
 
-Tfin=160.       # final time of the experiments
+Tfin=16.       # final time of the experiments
 Delta_t=0.16       # pi-pulse distance
 
 tone=7       # monochromatic or trichromatic
@@ -20,8 +20,8 @@ function mytime() {
 #rm Init/* Results/* Configurations/*
 
 g++ -o J J_experiment.cpp -lm
-#g++ -o h h_random.cpp -lm
-g++ -o h h_random_load.cpp -lm
+g++ -o h h_random.cpp -lm
+#g++ -o h h_random_load.cpp -lm
 g++ -o SA SA_spherical.cpp -lm -std=c++11
 
 

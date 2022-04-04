@@ -3,7 +3,7 @@
     The program computes the field h for the spin glass Hamiltonian. The field represents
     the signal to be detected.      
     The signal is composed of `tone` random frequencies in [0,1] MHz, random phases and random
-    amplitudes (that sum to 1).
+    amplitudes (that sum to 1).  Such numbers are loaded from Init/hData\_{...}
 
 //  -------------------------------------------------------------------------------------------  */
 

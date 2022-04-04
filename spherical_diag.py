@@ -2,7 +2,7 @@
 #   
 #   The program finds the configuration of continuous spins s[i] that minimezes the cost function
 #       
-#       H = 0.5 sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - sum_i s[i]**2
+#       H = 0.5 sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - lamda ( sum_i s[i]**2 - N )
 #
 #   - The variables `J[i,j]` and `h[i]` are loaded from Init/
 #   - Exact diagonalization is used instead of the FFT.
@@ -42,7 +42,7 @@ Jmat = toeplitz(J)
 h = np.loadtxt("Init/h_T%.4f_dt%.4f_t%d_h%d_r%d.txt" % (Tfin,Delta_t,tone,harmonic,rep))
 
 
-#  ------------------------------------  Fourier transform  ------------------------------------  #
+#  ---------------------------------------  diagonalize  ---------------------------------------  #
 
 JD, U = eigh(Jmat)
 
@@ -51,19 +51,8 @@ hD = np.dot( np.conj(U.T), h )
 
 #  ---------------------------------  functions for S.P. eqs.  ---------------------------------  #
 
-# l.h.s. of the equation
-def lhsTemp(lamda):
-    return np.sum( ( hD / (JD + lamda) )**2 )
-lhs = np.vectorize(lhsTemp)
-
-# r.h.s. of the equation
-def rhsTemp(lamda):
-    return N * np.abs( np.sum( hD**2 / (JD + lamda) ) )
-rhs = np.vectorize(rhsTemp)
-
-# combined equation
 def equation(lamda):
-    return lhs(lamda) - rhs(lamda)
+    return np.sum( ( hD / (JD + lamda) )**2 ) - N * np.abs( np.sum( hD**2 / (JD + lamda) ) )
     
 
 #  -------------------------------------  solve S.P. eqs.  -------------------------------------  #
@@ -71,9 +60,9 @@ def equation(lamda):
 # find interval [a,b] in which equation changes sign
 a = 0
 b = 0.1
-sign0 = np.sign(lhs(a)-rhs(a))
+sign0 = np.sign(equation(a))
 
-while np.sign(lhs(b)-rhs(b)) == sign0:
+while np.sign(equation(b)) == sign0:
     b += 0.1
 
 # solve equation in [a,b]
